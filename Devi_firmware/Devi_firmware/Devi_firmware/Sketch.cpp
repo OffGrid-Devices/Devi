@@ -32,6 +32,7 @@ void readControls();
 void setLeds(); // ?? 
 void setRGB(byte r, byte g, byte b);
 void setMode();
+void readPots();
 //End of Auto generated function prototypes by Atmel Studio
 #define CONTROL_RATE 1024
 Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier(SIN2048_DATA);
@@ -40,10 +41,10 @@ Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> lfo(SIN2048_DATA);
 //ADSR <CONTROL_RATE, AUDIO_RATE> amp;
 Ead dca(CONTROL_RATE); 
 int gain;
-unsigned int att=50, dcy=450;
+unsigned int att=25, dcy=200;
 uint8_t pitch[6] = {36, 39, 43, 46, 48, 29};
 uint8_t step = 0; 
-Metronome sequencer(500); // 120bpm
+Metronome sequencer(250); // 120bpm
 
 
 uint8_t filter_mode; // 0-LP, 1-BAND, 1-HP
@@ -53,25 +54,26 @@ uint8_t exec_mode = 7; // 0-ExtSeq, 1-IntSeq, 2-RndSeq, 3-Stack, 4-Arp, 5-Play, 
 boolean modebut, _modebut = true; // current and prev. MODE button value
 
 void setup(){
-  startMozzi(CONTROL_RATE);
-  //loadPreset(0);
-  
-  // set pins 
-  pinMode(PINRED, OUTPUT);
-  pinMode(PINGREEN, OUTPUT);
-  pinMode(PINBLUE, OUTPUT);
-  pinMode(PINBUT7, INPUT);
-  
-  // 
-  sequencer.start();
-  carrier.setFreq(220);
+    // set pins
+    pinMode(PINRED, OUTPUT);
+    pinMode(PINGREEN, OUTPUT);
+    pinMode(PINBLUE, OUTPUT);
+    pinMode(PINBUT7, INPUT);
+
+	startMozzi(CONTROL_RATE);
+	setupFastAnalogRead(FASTEST_ADC);
+	//loadPreset(0);
+    
+	// 
+	sequencer.start();
+	carrier.setFreq(220);
 }
 
 void updateControl(){
 	// update synth parameters
 	
 	// read controls
-	
+	readPots();
 	// set led's 
 	setMode();
 	
@@ -92,7 +94,8 @@ void updateControl(){
 
 int updateAudio(){ // TODO: [p1nh0] make sin table 14-bit instead of 8-bit?
 	// modulator-->carrier->fx->filter->adsr
-	return (carrier.next()*gain) >>2; // 14-bit (-8192..8191? or -16384..16833)
+	int sig = carrier.next() << 1;  
+	return (carrier.next()*gain) >>3; // 14-bit (-8192..8191? or -16384..16833)
 	// scale from 8-bit to 14-bit
 	// gain -128..127, carrier -128..127
 }
@@ -144,4 +147,11 @@ void setMode(){
 		}
 	}
 	_modebut = modebut;
+}
+
+void readPots(){
+	for (int i = 0; i < 6; i++)
+	{
+		pitch[i] = (mozziAnalogRead(i)>>4)+24; // notes from 24..88 
+	}
 }
