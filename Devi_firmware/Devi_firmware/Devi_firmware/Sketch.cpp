@@ -35,16 +35,20 @@ void setMode();
 void readPots();
 //End of Auto generated function prototypes by Atmel Studio
 #define CONTROL_RATE 1024
-Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier(SIN2048_DATA);
-Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> modulator(SIN2048_DATA);
-Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> lfo(SIN2048_DATA);
+Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier1(SIN2048_DATA);
+Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier2(SIN2048_DATA);
+/*Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier3(SIN2048_DATA);
+Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier4(SIN2048_DATA);
+Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier5(SIN2048_DATA);
+Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier6(SIN2048_DATA);*/
+
 //ADSR <CONTROL_RATE, AUDIO_RATE> amp;
 Ead dca(CONTROL_RATE); 
 int gain;
-unsigned int att=25, dcy=200;
+unsigned int att=25, dcy=450;
 uint8_t pitch[6] = {36, 39, 43, 46, 48, 29};
 uint8_t step = 0; 
-Metronome sequencer(250); // 120bpm
+Metronome sequencer(500); // 120bpm
 
 
 uint8_t filter_mode; // 0-LP, 1-BAND, 1-HP
@@ -66,7 +70,7 @@ void setup(){
     
 	// 
 	sequencer.start();
-	carrier.setFreq(220);
+	carrier2.setFreq(220);	
 }
 
 void updateControl(){
@@ -83,7 +87,7 @@ void updateControl(){
 			digitalWrite(i, HIGH);
 		}
 		digitalWrite(PINLED6-step, LOW);
-		carrier.setFreq(mtof(pitch[step]));
+		carrier1.setFreq(mtof(pitch[step]));
 		step++;
 		if(step > 5) step = 0;
 		dca.start(att, dcy);
@@ -94,8 +98,8 @@ void updateControl(){
 
 int updateAudio(){ // TODO: [p1nh0] make sin table 14-bit instead of 8-bit?
 	// modulator-->carrier->fx->filter->adsr
-	int sig = carrier.next() << 1;  
-	return (carrier.next()*gain) >>3; // 14-bit (-8192..8191? or -16384..16833)
+	int sig = (carrier1.next() + carrier2.next())>>2;  
+	return (sig*gain) >>3; // 14-bit (-8192..8191? or -16384..16833)
 	// scale from 8-bit to 14-bit
 	// gain -128..127, carrier -128..127
 }
