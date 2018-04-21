@@ -65,9 +65,17 @@ Button button[6];
 
 void setup(){
     // set pins
+	// LED's 
     pinMode(PINRED, OUTPUT);
     pinMode(PINGREEN, OUTPUT);
     pinMode(PINBLUE, OUTPUT);
+	pinMode(PINLED1, OUTPUT);
+	pinMode(PINLED2, OUTPUT);
+	pinMode(PINLED3, OUTPUT);
+	pinMode(PINLED4, OUTPUT);
+	pinMode(PINLED5, OUTPUT);
+	pinMode(PINLED6, OUTPUT);
+
     pinMode(PINBUT7, INPUT);
 	button[0].init(PINBUT1);
 	button[1].init(PINBUT2);
