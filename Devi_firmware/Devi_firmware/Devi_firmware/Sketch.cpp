@@ -28,22 +28,23 @@ Mozzi version = master(22-04-2018)
 //Beginning of Auto generated function prototypes by Atmel Studio
 void updateControl();
 int updateAudio();
-
+// utilities
+void setRGB(byte r, byte g, byte b);
+void allLedsOff();
+// setups
 void buttonSetup();
 void ledSetup();
 void knobSetup();
 void voiceSetup();
-
-void setRGB(byte r, byte g, byte b);
-void allLedsOff();
-
+// controls
 void readButtons();
 void readKnobs();
+// synth functions 
 void setMode();
 void execMode(); 
 void execMode0(); void execMode1(); void execMode2(); void execMode3(); 
 void execMode4(); void execMode5(); void execMode6(); void execMode7();
-
+// synth utilities
 void incStep();
 //End of Auto generated function prototypes by Atmel Studio
 
@@ -99,18 +100,14 @@ void updateControl(){
 
 
 int updateAudio(){ 
-	/*int sig = (carrier1.next() + carrier2.next())>>2;  
-	return (sig*gain)>>1; // 14-bit (-8192..8191? or -16384..16833)
-	*/
-	//return (voice[0].next() + voice[1].next() + voice[2].next() + voice[3].next() + voice[4].next() + voice[5].next() );
 	return ( (long)	voice[0].next() + 
 					voice[1].next() + 
 					voice[2].next() + 
 					voice[3].next() +
 					voice[4].next() +
 					voice[5].next() 
-		   )		>>4;// 12;
-	// scale from 8-bit to 14-bit (gain{-128, 127}, oscillator {-128, 127})
+		   )		>>4; // 6 voices(98304 to 98303) >>4 (-6144 to 6143)
+	// 14-bit output: -8192 to 8192
 }
 
 void loop(){
@@ -118,6 +115,21 @@ void loop(){
 }
 
 // DEVI FUNCTIONS
+void allLedsOff(){
+	digitalWrite(PINLED1, LOW);
+	digitalWrite(PINLED2, LOW);
+	digitalWrite(PINLED3, LOW);
+	digitalWrite(PINLED4, LOW);
+	digitalWrite(PINLED5, LOW);
+	digitalWrite(PINLED6, LOW);
+	digitalWrite(PINLED7, LOW);
+}
+void setRGB(byte r, byte g, byte b){
+	digitalWrite(PINRED, r);
+	digitalWrite(PINGREEN, g);
+	digitalWrite(PINBLUE, b);
+}
+
 void buttonSetup(){
 	button[0].init(PINBUT1);
 	button[1].init(PINBUT2);
@@ -153,20 +165,6 @@ void voiceSetup(){
 	{
 		voice[i].init(pitch[i], CONTROL_RATE);	
 	}
-}
-void allLedsOff(){
-	digitalWrite(PINLED1, LOW);
-	digitalWrite(PINLED2, LOW);
-	digitalWrite(PINLED3, LOW);
-	digitalWrite(PINLED4, LOW);
-	digitalWrite(PINLED5, LOW);
-	digitalWrite(PINLED6, LOW);
-	digitalWrite(PINLED7, LOW);
-}
-void setRGB(byte r, byte g, byte b){
-	digitalWrite(PINRED, r);
-	digitalWrite(PINGREEN, g);
-	digitalWrite(PINBLUE, b);
 }
 
 void readButtons(){
