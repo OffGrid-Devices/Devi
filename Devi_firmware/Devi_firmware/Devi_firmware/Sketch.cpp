@@ -233,8 +233,8 @@ void readButtons(){
 	button[6].read();
 	button[7].read();
 	
-	selectLock = false;
-	modeLock = false; 
+	//selectLock = false;
+	//modeLock = false; 
 }
 void readKnobs(){
 	knob[0].read();
@@ -286,7 +286,7 @@ void execMode1(){
 	}
 		
 	// set sequencer start/stop
-	/*if( button[6].changed && !selectLock && !button[6].state) // trigger on button released
+	if( button[6].changed && !selectLock && !button[6].state) // trigger on button released
 	{
 		seqSwitch = !seqSwitch;
 			
@@ -299,7 +299,10 @@ void execMode1(){
 			metro.stop();
 			allLedsOff();
 		}
-	}*/
+	}
+	
+	// release SELECT lock
+	if(!button[6].state) selectLock = false; 
 		
 	// sequencer update
 	if ( metro.ready() ){
