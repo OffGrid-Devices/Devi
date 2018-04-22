@@ -44,12 +44,12 @@
 58 PC5 ( A13 ) Digital pin 32
 59 PC6 ( A14 ) Digital pin 31
 60 PC7 ( A15 ) Digital pin 30 */ 
-#define PINLED1 5
-#define PINLED2 6
-#define PINLED3 7
-#define PINLED4 8
-#define PINLED5 9
-#define PINLED6 10
+#define PINLED1 10
+#define PINLED2 9
+#define PINLED3 8
+#define PINLED4 7
+#define PINLED5 6
+#define PINLED6 5
 #define PINLED7 13
 /*43 PD0 ( SCL/INT0 ) Digital pin 21 (SCL)
 44 PD1 ( SDA/INT1 ) Digital pin 20 (SDA)
