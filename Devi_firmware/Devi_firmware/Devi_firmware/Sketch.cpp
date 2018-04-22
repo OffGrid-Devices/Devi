@@ -8,13 +8,16 @@
 OffGrid-Devices Devi revB : Arduino+Mozzi based synthesizer
 by p1nh0 2018
 
+Mozzi lib by Tim Barrass
 Mozzi AUDIO_RATE = 32768
 Mozzi mode = HIFI  
+Mozzi version = master(22-04-2018)
 */
 
 #include <MozziGuts.h>
 #include <Metronome.h>
 #include <mozzi_rand.h>
+#include <mozzi_fixmath.h>
 
 #include "GLOBALS.h"
 #include "Button.h"
@@ -51,8 +54,8 @@ Voice voice[6];
 //Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier2(SIN2048_DATA);
 
 // SYNTH VARIABLES
-Ead dca(CONTROL_RATE); 
-int gain;
+//Ead dca(CONTROL_RATE); 
+//int gain;
 unsigned int att=25, dcy=150;
 uint8_t pitch[6] = {36, 39, 43, 46, 48, 29};
 
@@ -100,7 +103,13 @@ int updateAudio(){
 	return (sig*gain)>>1; // 14-bit (-8192..8191? or -16384..16833)
 	*/
 	//return (voice[0].next() + voice[1].next() + voice[2].next() + voice[3].next() + voice[4].next() + voice[5].next() );
-	return ( voice[0].next()+voice[1].next() ) << 5;
+	return ( (long)	voice[0].next() + 
+					voice[1].next() + 
+					voice[2].next() + 
+					voice[3].next() +
+					voice[4].next() +
+					voice[5].next() 
+		   )		>>4;// 12;
 	// scale from 8-bit to 14-bit (gain{-128, 127}, oscillator {-128, 127})
 }
 

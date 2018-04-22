@@ -1,4 +1,4 @@
-/* 
+/*
 * Potentiometer.cpp
 *
 * Created: 22-04-2018 04:50:15
@@ -19,12 +19,12 @@ Potentiometer::~Potentiometer()
 } //~Potentiometer
 
 void Potentiometer::init(byte p){
-	pin = p; 
+	pin = p;
 }
 
 void Potentiometer::read(){
 	val = mozziAnalogRead(pin) >> 3; // 0..127
 	if ( val != _val )   changed = true;
-	else   changed = false;	
+	else   changed = false;
 	_val = val;
 }

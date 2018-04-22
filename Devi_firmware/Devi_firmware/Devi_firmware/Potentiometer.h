@@ -1,4 +1,4 @@
-/* 
+/*
 * Potentiometer.h
 *
 * Created: 22-04-2018 04:50:15
@@ -14,22 +14,22 @@
 
 class Potentiometer
 {
-//variables
-public:
+	//variables
+	public:
 	uint8_t val, _val; // 0-released, 1-pressed
 	boolean changed;
-	uint8_t pin; 
-protected:
-private:
+	uint8_t pin;
+	protected:
+	private:
 
-//functions
-public:
+	//functions
+	public:
 	Potentiometer();
 	~Potentiometer();
 	void init(byte p);
 	void read();
-protected:
-private:
+	protected:
+	private:
 	Potentiometer( const Potentiometer &c );
 	Potentiometer& operator=( const Potentiometer &c );
 

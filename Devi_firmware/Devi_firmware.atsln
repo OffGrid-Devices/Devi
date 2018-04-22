@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "Devi_firmware", "Devi_firmware\Devi_firmware\Devi_firmware.cppproj", "{DCE6C7E3-EE26-4D79-826B-08594B9AD897}"
 EndProject
-Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "ArduinoCore", "Devi_firmware\ArduinoCore\ArduinoCore.cppproj", "{2B5B1061-EDD7-4F73-B9F6-B1C9099DA9EB}"
+Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "ArduinoCore", "Devi_firmware\ArduinoCore\ArduinoCore.cppproj", "{51790231-8FEA-4455-ABAD-538B94DEB3C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Debug|AVR.Build.0 = Debug|AVR
 		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Release|AVR.ActiveCfg = Release|AVR
 		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Release|AVR.Build.0 = Release|AVR
-		{2B5B1061-EDD7-4F73-B9F6-B1C9099DA9EB}.Debug|AVR.ActiveCfg = Debug|AVR
-		{2B5B1061-EDD7-4F73-B9F6-B1C9099DA9EB}.Debug|AVR.Build.0 = Debug|AVR
-		{2B5B1061-EDD7-4F73-B9F6-B1C9099DA9EB}.Release|AVR.ActiveCfg = Release|AVR
-		{2B5B1061-EDD7-4F73-B9F6-B1C9099DA9EB}.Release|AVR.Build.0 = Release|AVR
+		{51790231-8FEA-4455-ABAD-538B94DEB3C1}.Debug|AVR.ActiveCfg = Debug|AVR
+		{51790231-8FEA-4455-ABAD-538B94DEB3C1}.Debug|AVR.Build.0 = Debug|AVR
+		{51790231-8FEA-4455-ABAD-538B94DEB3C1}.Release|AVR.ActiveCfg = Release|AVR
+		{51790231-8FEA-4455-ABAD-538B94DEB3C1}.Release|AVR.Build.0 = Release|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

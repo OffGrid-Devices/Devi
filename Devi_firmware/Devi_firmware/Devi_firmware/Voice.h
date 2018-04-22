@@ -1,4 +1,4 @@
-/* 
+/*
 * Voice.h
 *
 * Created: 22-04-2018 19:25:00
@@ -16,25 +16,25 @@
 
 class Voice
 {
-//variables
-public:
-protected:
-private:
+	//variables
+	public:
+	protected:
+	private:
 	Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier;
-	Ead* dca; 
+	Ead* dca;
 	int gain;
 	unsigned int att=25, dcy=450;
-//functions
-public:
+	//functions
+	public:
 	Voice();
 	~Voice();
 	void init(int freq, int ctrl_rate);
 	void setPitch(uint8_t freq);
-	int next(); 
+	int next();
 	void startDCA(int a, int d);
 	void updateEnvelopes();
-protected:
-private:
+	protected:
+	private:
 	Voice( const Voice &c );
 	Voice& operator=( const Voice &c );
 

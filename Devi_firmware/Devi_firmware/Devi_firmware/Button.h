@@ -1,4 +1,4 @@
-/* 
+/*
 * Button.h
 *
 * Created: 15-04-2018 12:05:15
@@ -13,23 +13,23 @@
 
 class Button
 {
-//variables
-public:
+	//variables
+	public:
 	boolean state; // 0-released, 1-pressed
 	boolean changed;
-protected:
-private:
-	boolean val, _val = 1; 
+	protected:
+	private:
+	boolean val, _val = 1;
 
-//functions
-public:
+	//functions
+	public:
 	Button();
 	~Button();
 	void init(byte p);
 	void read();
-	//boolean changed(); 
-protected:
-private:
+	//boolean changed();
+	protected:
+	private:
 	Button( const Button &c );
 	Button& operator=( const Button &c );
 	byte pin;

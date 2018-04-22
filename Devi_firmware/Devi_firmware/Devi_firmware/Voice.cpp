@@ -1,4 +1,4 @@
-/* 
+/*
 * Voice.cpp
 *
 * Created: 22-04-2018 19:25:00
@@ -26,11 +26,11 @@ void Voice::init(int freq, int ctrl_rate){
 }
 
 void Voice::setPitch(uint8_t note){
-	carrier.setFreq( mtof(note) );	
+	carrier.setFreq( mtof(note) );
 }
 
 int Voice::next(){
-	return (carrier.next() * gain) >> 7; 
+	return (carrier.next() * gain);
 }
 
 void Voice::startDCA(int a, int d){
