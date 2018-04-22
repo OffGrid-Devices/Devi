@@ -9,6 +9,9 @@
 #ifndef GLOBALS_H_
 #define GLOBALS_H_
 
+//COMPILER
+#define OPTIMIZATION "O3"
+
 //HARDWARE
 // buttons
 /*PL0 ( ICP4 ) Digital pin 49

@@ -6,6 +6,9 @@
 */
 
 
+#pragma GCC push_options
+#pragma GCC optimize (OPTIMIZATION)
+
 #include "Button.h"
 
 // default constructor
@@ -36,14 +39,5 @@ void Button::read(){
 	
 	_val = val;	
 }
-/*
-boolean Button::changed(){
-	state = digitalRead(pin);
-	//return state | state;
-	if(state < _state){    
-		return true;
-	}
-	else return false; 
-	
-	_state = state;
-}*/
+
+#pragma GCC pop_options

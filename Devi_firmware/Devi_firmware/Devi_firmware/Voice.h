@@ -9,6 +9,9 @@
 #ifndef __VOICE_H__
 #define __VOICE_H__
 
+#pragma GCC push_options
+#pragma GCC optimize (OPTIMIZATION)
+
 #include <Oscil.h>
 #include <Ead.h>
 #include <mozzi_midi.h>
@@ -39,5 +42,7 @@ class Voice
 	Voice& operator=( const Voice &c );
 
 }; //Voice
+
+#pragma GCC pop_options
 
 #endif //__VOICE_H__

@@ -9,6 +9,9 @@
 #ifndef __BUTTON_H__
 #define __BUTTON_H__
 
+#pragma GCC push_options
+#pragma GCC optimize (OPTIMIZATION)
+
 #include "Arduino.h"
 
 class Button
@@ -34,5 +37,7 @@ class Button
 	Button& operator=( const Button &c );
 	byte pin;
 }; //Button
+
+#pragma GCC pop_options
 
 #endif //__BUTTON_H__

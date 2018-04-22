@@ -8,6 +8,9 @@
 
 #include "Voice.h"
 
+#pragma GCC push_options
+#pragma GCC optimize (OPTIMIZATION)
+
 // default constructor
 Voice::Voice()
 {
@@ -41,3 +44,5 @@ void Voice::startDCA(int a, int d){
 void Voice::updateEnvelopes(){
 	gain = (int) dca->next();
 }
+
+#pragma GCC pop_options

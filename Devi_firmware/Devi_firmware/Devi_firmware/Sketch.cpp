@@ -14,12 +14,17 @@ Mozzi mode = HIFI
 Mozzi version = master(22-04-2018)
 */
 
+#include "GLOBALS.h"
+
+#pragma GCC push_options
+#pragma GCC optimize (OPTIMIZATION)
+
+
 #include <MozziGuts.h>
 #include <Metronome.h>
 #include <mozzi_rand.h>
 #include <mozzi_fixmath.h>
 
-#include "GLOBALS.h"
 #include "Button.h"
 #include "Potentiometer.h"
 #include "Voice.h"
@@ -51,12 +56,7 @@ void incStep();
 #define CONTROL_RATE 512
 Voice voice[6];
 
-//Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier1(SIN2048_DATA);
-//Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier2(SIN2048_DATA);
-
 // SYNTH VARIABLES
-//Ead dca(CONTROL_RATE); 
-//int gain;
 unsigned int att=25, dcy=150;
 uint8_t pitch[6] = {36, 39, 43, 46, 48, 29};
 
@@ -87,8 +87,6 @@ void setup(){
 	randSeed();
 	startMozzi(CONTROL_RATE);
 	setupFastAnalogRead(FASTEST_ADC);
-
-	//carrier2.setFreq(220);	
 }
 
 void updateControl(){
@@ -423,3 +421,5 @@ void incStep(){
 void execMode5(){
 	
 }
+
+#pragma GCC pop_options

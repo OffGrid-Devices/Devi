@@ -9,6 +9,9 @@
 #ifndef __POTENTIOMETER_H__
 #define __POTENTIOMETER_H__
 
+#pragma GCC push_options
+#pragma GCC optimize (OPTIMIZATION)
+
 #include "Arduino.h"
 #include "mozzi_analog.h"
 
@@ -34,5 +37,7 @@ class Potentiometer
 	Potentiometer& operator=( const Potentiometer &c );
 
 }; //Potentiometer
+
+#pragma GCC pop_options
 
 #endif //__POTENTIOMETER_H__

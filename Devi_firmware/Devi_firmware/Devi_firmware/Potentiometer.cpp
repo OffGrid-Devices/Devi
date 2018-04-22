@@ -5,6 +5,8 @@
 * Author: tiago
 */
 
+#pragma GCC push_options
+#pragma GCC optimize (OPTIMIZATION)
 
 #include "Potentiometer.h"
 
@@ -28,3 +30,5 @@ void Potentiometer::read(){
 	else   changed = false;
 	_val = val;
 }
+
+#pragma GCC pop_options
