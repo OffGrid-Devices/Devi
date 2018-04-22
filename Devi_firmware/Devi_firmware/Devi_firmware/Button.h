@@ -15,15 +15,19 @@ class Button
 {
 //variables
 public:
+	boolean state; // 0-released, 1-pressed
+	boolean changed;
 protected:
 private:
+	boolean val, _val = 1; 
 
 //functions
 public:
 	Button();
 	~Button();
 	void init(byte p);
-	boolean getState(); 
+	void read();
+	//boolean changed(); 
 protected:
 private:
 	Button( const Button &c );
