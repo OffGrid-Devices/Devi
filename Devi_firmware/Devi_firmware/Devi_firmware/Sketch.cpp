@@ -18,6 +18,7 @@ Mozzi mode = HIFI
 
 #include "GLOBALS.h"
 #include "Button.h"
+#include "Sequencer.h"
 
 #include "tables/sin2048_int8.h"
 
@@ -36,6 +37,7 @@ void setRGB(byte r, byte g, byte b);
 void setMode();
 void readPots();
 void readButtons();
+void allLedsOff();
 //End of Auto generated function prototypes by Atmel Studio
 #define CONTROL_RATE 512
 Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier1(SIN2048_DATA);
@@ -52,8 +54,12 @@ int gain;
 unsigned int att=25, dcy=450;
 uint8_t pitch[6] = {36, 39, 43, 46, 48, 29};
 boolean mute[6] = {true, true, true, true, true, true};
-uint8_t step = 0; 
-Metronome sequencer(500); // 120bpm
+uint8_t step = 0;
+uint16_t bpm = 4*120; 
+//const uint8_t blinkRatio = bpm/2; 
+boolean seqTrigger = 1; // actually runs at twice the audible sequencer rate to turn bpm led indicator on/off (1-triggers envelopes and led on; 0- triggers led off)
+Metronome sequencer(60000/bpm/2); // 120bpm
+boolean seqSwitch = true;
 
 uint8_t filter_mode; // 0-LP, 1-BAND, 1-HP
 uint8_t fx_mode; // 0-OFF, 1-<<, 2->>, 3-&, 4-|, 5-^
@@ -61,7 +67,7 @@ uint8_t exec_mode = 7; // 0-ExtSeq, 1-IntSeq, 2-RndSeq, 3-Stack, 4-Arp, 5-Play, 
 
 // HARDWARE VARIABLES
 boolean modebut, _modebut = true; // current and prev. MODE button value
-Button button[6]; 
+Button button[8]; 
 
 void setup(){
     // set pins
@@ -75,6 +81,7 @@ void setup(){
 	pinMode(PINLED4, OUTPUT);
 	pinMode(PINLED5, OUTPUT);
 	pinMode(PINLED6, OUTPUT);
+	pinMode(PINLED7, OUTPUT);
 
     pinMode(PINBUT7, INPUT);
 	button[0].init(PINBUT1);
@@ -83,15 +90,16 @@ void setup(){
 	button[3].init(PINBUT4);
 	button[4].init(PINBUT5);
 	button[5].init(PINBUT6);
+	button[7].init(PINBUT8);
 	
 	//Serial.begin(9600);
 	startMozzi(CONTROL_RATE);
 	setupFastAnalogRead(FASTEST_ADC);
-	
+	//sequencer.setBPM(bpm*2.f);
 	//loadPreset(0);
     
 	// 
-	sequencer.start();
+	sequencer.stop();
 	carrier2.setFreq(220);	
 }
 
@@ -105,17 +113,28 @@ void updateControl(){
 	setMode();
 	
 	// sequencer
-	if(sequencer.ready()){
-		for(int i = 0; i < 6; i++){
-			if(mute[i]) digitalWrite(PINLED1-i, HIGH);
-			else digitalWrite(PINLED1-i, LOW);
-		}
-		digitalWrite(PINLED1-step, LOW);
-		carrier1.setFreq(mtof(pitch[step]));
-		if(mute[step]) dca.start(att, dcy);
-		step++;
-		if(step > 5) step = 0;
+	if ( sequencer.ready() ){
+			
+			if ( seqTrigger )
+			{ // trigger on
+				for ( int i = 0; i < 6; i++ )
+				{
+					if( mute[i] )   digitalWrite(PINLED1-i, HIGH);
+					else digitalWrite(PINLED1-i, LOW);
+				}
+				digitalWrite(PINLED1-step, LOW);
+				digitalWrite(PINLED7, HIGH);
+				carrier1.setFreq( mtof(pitch[step]) );
+				if ( mute[step] )   dca.start(att, dcy);
+				step++;
+				if ( step > 5 )   step = 0;
+			}
+			else{ // trigger off
+				digitalWrite(PINLED7, LOW); 
+			}
+			seqTrigger = !seqTrigger;
 	}
+	
 	gain = (int) dca.next();
 }
 
@@ -130,13 +149,6 @@ int updateAudio(){ // TODO: [p1nh0] make sin table 14-bit instead of 8-bit?
 
 void loop(){
   audioHook();
-	/*readButtons();
-	Serial.print(mute[0]); Serial.print(" ");
-	Serial.print(mute[1]); Serial.print(" ");
-	Serial.print(mute[2]); Serial.print(" ");
-	Serial.print(mute[3]); Serial.print(" ");
-	Serial.print(mute[4]); Serial.print(" ");
-	Serial.print(mute[5]); Serial.println(); */
 }
 
 void setRGB(byte r, byte g, byte b){
@@ -148,6 +160,7 @@ void setRGB(byte r, byte g, byte b){
 void setMode(){
 	modebut = digitalRead(PINBUT7); // read MODE button
 	if (modebut < _modebut){
+		allLedsOff();
 		exec_mode++;
 		if(exec_mode>7) exec_mode = 0;
 	
@@ -157,6 +170,7 @@ void setMode(){
 			break;
 			case 1: // internal sequencer (orange)
 			setRGB(HIGH, HIGH, LOW);
+			if(seqTrigger) sequencer.start();
 			break;
 			case 2: // randomize sequence (purple)
 			setRGB(HIGH, LOW, HIGH);
@@ -192,18 +206,37 @@ void readPots(){
 }
 
 void readButtons(){
-	if(button[0].changed())	mute[0] = !mute[0];
-	if(button[1].changed())	mute[1] = !mute[1];
-	if(button[2].changed())	mute[2] = !mute[2];
-	if(button[3].changed())	mute[3] = !mute[3];
-	if(button[4].changed())	mute[4] = !mute[4];
-	if(button[5].changed())	mute[5] = !mute[5];	
-		
-	/*for (int i = 0; i < 6; i++)
-	{			
-		if(button[i].changed()) {
-			mute[i] = !mute[i];	
-			//digitalWrite(PINLED1-i, mute[i]);
+	if( button[0].changed() )	mute[0] = !mute[0];
+	if( button[1].changed() )	mute[1] = !mute[1];
+	if( button[2].changed() )	mute[2] = !mute[2];
+	if( button[3].changed() )	mute[3] = !mute[3];
+	if( button[4].changed() )	mute[4] = !mute[4];
+	if( button[5].changed() )	mute[5] = !mute[5];
+	
+	if ( exec_mode == 1)
+	{
+		if( button[7].changed() )
+		{
+			seqSwitch = !seqSwitch;
+			if ( seqSwitch ) sequencer.start();
+			else {
+				sequencer.stop();
+				allLedsOff();
+			}
 		}
-	}*/
+	}
+	else
+	{
+		sequencer.stop();	
+	}
+}
+
+void allLedsOff(){
+	digitalWrite(PINLED1, LOW);
+	digitalWrite(PINLED2, LOW);
+	digitalWrite(PINLED3, LOW);
+	digitalWrite(PINLED4, LOW);
+	digitalWrite(PINLED5, LOW);
+	digitalWrite(PINLED6, LOW);
+	digitalWrite(PINLED7, LOW);
 }
