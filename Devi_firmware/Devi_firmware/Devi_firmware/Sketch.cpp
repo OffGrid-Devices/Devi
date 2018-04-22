@@ -13,18 +13,14 @@ Mozzi mode = HIFI
 */
 
 #include <MozziGuts.h>
-#include <Oscil.h>
-#include <Ead.h>
 #include <Metronome.h>
-#include <mozzi_midi.h>
 #include <mozzi_rand.h>
 
 #include "GLOBALS.h"
-
 #include "Button.h"
 #include "Potentiometer.h"
+#include "Voice.h"
 
-#include "tables/sin2048_int8.h"
 
 //Beginning of Auto generated function prototypes by Atmel Studio
 void updateControl();
@@ -33,6 +29,7 @@ int updateAudio();
 void buttonSetup();
 void ledSetup();
 void knobSetup();
+void voiceSetup();
 
 void setRGB(byte r, byte g, byte b);
 void allLedsOff();
@@ -48,14 +45,15 @@ void incStep();
 //End of Auto generated function prototypes by Atmel Studio
 
 #define CONTROL_RATE 512
+Voice voice[6];
 
-Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier1(SIN2048_DATA);
-Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier2(SIN2048_DATA);
+//Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier1(SIN2048_DATA);
+//Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier2(SIN2048_DATA);
 
 // SYNTH VARIABLES
 Ead dca(CONTROL_RATE); 
 int gain;
-unsigned int att=25, dcy=450;
+unsigned int att=25, dcy=150;
 uint8_t pitch[6] = {36, 39, 43, 46, 48, 29};
 
 boolean mute[6] = {true, true, true, true, true, true};
@@ -80,12 +78,13 @@ void setup(){
 	ledSetup();
 	buttonSetup();
 	knobSetup();
+	voiceSetup();
 	//Serial.begin(9600);
 	randSeed();
 	startMozzi(CONTROL_RATE);
 	setupFastAnalogRead(FASTEST_ADC);
 
-	carrier2.setFreq(220);	
+	//carrier2.setFreq(220);	
 }
 
 void updateControl(){
@@ -97,8 +96,11 @@ void updateControl(){
 
 
 int updateAudio(){ 
-	int sig = (carrier1.next() + carrier2.next())>>2;  
+	/*int sig = (carrier1.next() + carrier2.next())>>2;  
 	return (sig*gain)>>1; // 14-bit (-8192..8191? or -16384..16833)
+	*/
+	//return (voice[0].next() + voice[1].next() + voice[2].next() + voice[3].next() + voice[4].next() + voice[5].next() );
+	return ( voice[0].next()+voice[1].next() ) << 5;
 	// scale from 8-bit to 14-bit (gain{-128, 127}, oscillator {-128, 127})
 }
 
@@ -137,7 +139,12 @@ void knobSetup(){
 	knob[4].init(A4);
 	knob[5].init(A5);
 }
-
+void voiceSetup(){
+	for (int i = 0; i < 6; i++)
+	{
+		voice[i].init(pitch[i], CONTROL_RATE);	
+	}
+}
 void allLedsOff(){
 	digitalWrite(PINLED1, LOW);
 	digitalWrite(PINLED2, LOW);
@@ -332,8 +339,11 @@ void execMode1(){
 			}
 			digitalWrite(PINLED1-step, LOW);
 			digitalWrite(PINLED7, HIGH);
-			carrier1.setFreq( mtof(pitch[step]) );
-			if ( mute[step] )   dca.start(att, dcy);
+			
+			voice[step].setPitch( pitch[step] );
+			//if ( mute[step] )   dca.start(att, dcy);
+			if ( mute[step] )   voice[step].startDCA(att, dcy);
+			
 			if ( steps > 1 ) incStep();
 		}
 		else{ // update leds running a 2x the metronome speed
@@ -342,9 +352,13 @@ void execMode1(){
 		seqTrigger = !seqTrigger;
 	}
 	
-	gain = (int) dca.next();
+	voice[0].updateEnvelopes();
+	voice[1].updateEnvelopes();
+	voice[2].updateEnvelopes();
+	voice[3].updateEnvelopes();
+	voice[4].updateEnvelopes();
+	voice[5].updateEnvelopes();
 }
-
 void incStep(){
 	switch(stepMode){
 		case 0: // up
@@ -397,4 +411,8 @@ void incStep(){
 		default:
 		break;
 	}
+}
+
+void execMode5(){
+	
 }
