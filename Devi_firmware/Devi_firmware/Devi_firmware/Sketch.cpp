@@ -9,7 +9,7 @@ OffGrid-Devices Devi revB : Arduino+Mozzi based synthesizer
 by p1nh0 2018
 
 Mozzi lib by Tim Barrass
-Mozzi AUDIO_RATE = 32768
+Mozzi AUDIO_RATE = 32768Hz
 Mozzi mode = HIFI  
 Mozzi version = master(22-04-2018)
 */
@@ -19,6 +19,10 @@ Mozzi version = master(22-04-2018)
 #pragma GCC push_options
 #pragma GCC optimize (OPTIMIZATION)
 
+
+#define CONTROL_RATE 512
+// 512 is optimal for Ead
+// 64 is optimal for ADSR
 
 #include <MozziGuts.h>
 #include <Metronome.h>
@@ -53,7 +57,6 @@ void execMode4(); void execMode5(); void execMode6(); void execMode7();
 void incStep();
 //End of Auto generated function prototypes by Atmel Studio
 
-#define CONTROL_RATE 512
 Voice voice[6];
 
 // SYNTH VARIABLES
@@ -343,26 +346,33 @@ void execMode1(){
 				else digitalWrite(PINLED1-i, LOW);
 			}
 			digitalWrite(PINLED1-step, LOW);
-			digitalWrite(PINLED7, HIGH);
+			digitalWrite(PINLED7, LOW);
 			
 			voice[step].setPitch( pitch[step] );
-			//if ( mute[step] )   dca.start(att, dcy);
-			if ( mute[step] )   voice[step].startDCA(att, dcy);
 			
+			//if ( mute[step] )   voice[step].noteOff();
+			if ( mute[step] )   voice[step].startDCA();
 			if ( steps > 1 ) incStep();
+			//if ( mute[step] )   voice[step].noteOn();
 		}
 		else{ // update leds running a 2x the metronome speed
-			digitalWrite(PINLED7, LOW);
+			digitalWrite(PINLED7, HIGH);
 		}
 		seqTrigger = !seqTrigger;
 	}
-	
 	voice[0].updateEnvelopes();
 	voice[1].updateEnvelopes();
 	voice[2].updateEnvelopes();
 	voice[3].updateEnvelopes();
 	voice[4].updateEnvelopes();
 	voice[5].updateEnvelopes();
+	// ADSR
+	/*voice[0].updateEnv();
+	voice[1].updateEnv();
+	voice[2].updateEnv();
+	voice[3].updateEnv();
+	voice[4].updateEnv();
+	voice[5].updateEnv();*/
 }
 void incStep(){
 	switch(stepMode){

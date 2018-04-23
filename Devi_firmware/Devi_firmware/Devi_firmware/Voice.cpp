@@ -22,10 +22,14 @@ Voice::~Voice()
 {
 } //~Voice
 
-void Voice::init(int freq, int ctrl_rate){
+void Voice::init(uint8_t pitch, uint16_t ctrl_rate){
 	carrier.setTable(SIN2048_DATA);
-	carrier.setFreq( mtof(freq) );
+	carrier.setFreq( mtof(pitch) );
 	dca = new Ead(ctrl_rate);
+	att=25, dcy=450;
+	
+	env.setADLevels(255, 255);
+	env.setTimes(att, 25, 500, dcy);  
 }
 
 void Voice::setPitch(uint8_t note){
@@ -34,15 +38,27 @@ void Voice::setPitch(uint8_t note){
 
 int Voice::next(){
 	return (carrier.next() * gain);
+	//return carrier.next() * env.next();
 }
 
-void Voice::startDCA(int a, int d){
-	att = a; dcy = d;
+void Voice::startDCA(){
 	dca->start(att, dcy);
 }
 
 void Voice::updateEnvelopes(){
-	gain = (int) dca->next();
+	gain = dca->next();
+}
+
+void Voice::noteOn(){
+	env.noteOn();
+}
+
+void Voice::noteOff(){
+	env.noteOff();	
+}
+
+void Voice::updateEnv(){
+	env.update();
 }
 
 #pragma GCC pop_options

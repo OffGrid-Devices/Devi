@@ -12,8 +12,10 @@
 #pragma GCC push_options
 #pragma GCC optimize (OPTIMIZATION)
 
+#include <mozzi_config.h>
 #include <Oscil.h>
 #include <Ead.h>
+#include <ADSR.h>
 #include <mozzi_midi.h>
 #include "tables/sin2048_int8.h"
 
@@ -25,17 +27,21 @@ class Voice
 	private:
 	Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier;
 	Ead* dca;
+	ADSR<CONTROL_RATE, AUDIO_RATE> env; 
 	int gain;
-	unsigned int att=25, dcy=450;
+	unsigned int att, dcy;
 	//functions
 	public:
 	Voice();
 	~Voice();
-	void init(int freq, int ctrl_rate);
 	void setPitch(uint8_t freq);
 	int next();
-	void startDCA(int a, int d);
+	void startDCA();
 	void updateEnvelopes();
+	void noteOn();
+	void noteOff();
+	void updateEnv();
+	
 	protected:
 	private:
 	Voice( const Voice &c );
