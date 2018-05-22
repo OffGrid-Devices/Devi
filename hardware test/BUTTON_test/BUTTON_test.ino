@@ -1,43 +1,43 @@
-// Buttons 1~6 on ports 14~19
-// Button 7 on port 20
-// Button 8 on port 21
-#define B1 14
-#define B2 15
-#define B3 16
-#define B4 17
-#define B5 18
-#define B6 19
-#define B7 20
-#define B8 21
+// BUTTONuttons 1~6 on ports 14~19
+// BUTTONutton 7 on port 20
+// BUTTONutton 8 on port 21
+#define BUTTON1 22
+#define BUTTON2 23
+#define BUTTON3 24
+#define BUTTON4 25
+#define BUTTON5 26
+#define BUTTON6 27
+#define BUTTON7 28
+#define BUTTON8 29
 
 void setup() {
   Serial.begin(9600);
-  pinMode(B1, INPUT);
-  pinMode(B2, INPUT);
-  pinMode(B3, INPUT);
-  pinMode(B4, INPUT);
-  pinMode(B5, INPUT);
-  pinMode(B6, INPUT);
-  pinMode(B7, INPUT);
-  pinMode(B8, INPUT);
+  pinMode(BUTTON1, INPUT);
+  pinMode(BUTTON2, INPUT);
+  pinMode(BUTTON3, INPUT);
+  pinMode(BUTTON4, INPUT);
+  pinMode(BUTTON5, INPUT);
+  pinMode(BUTTON6, INPUT);
+  pinMode(BUTTON7, INPUT);
+  pinMode(BUTTON8, INPUT);
 }
 
 void loop() {
-  Serial.print(digitalRead(B1));
+  Serial.print(digitalRead(BUTTON1));
   Serial.print(" ");
-  Serial.print(digitalRead(B2));
+  Serial.print(digitalRead(BUTTON2));
   Serial.print(" ");
-  Serial.print(digitalRead(B3));
+  Serial.print(digitalRead(BUTTON3));
   Serial.print(" ");
-  Serial.print(digitalRead(B4));
+  Serial.print(digitalRead(BUTTON4));
   Serial.print(" ");
-  Serial.print(digitalRead(B5));
+  Serial.print(digitalRead(BUTTON5));
   Serial.print(" ");
-  Serial.print(digitalRead(B6));
+  Serial.print(digitalRead(BUTTON6));
   Serial.print(" ");
-  Serial.print(digitalRead(B7));
+  Serial.print(digitalRead(BUTTON7));
   Serial.print(" ");
-  Serial.print(digitalRead(B8));
+  Serial.print(digitalRead(BUTTON8));
   Serial.print(" ");
 
   Serial.println();
