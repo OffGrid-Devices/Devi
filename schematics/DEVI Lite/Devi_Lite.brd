@@ -54,7 +54,7 @@
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
 <layer number="45" name="Holes" color="7" fill="1" visible="no" active="yes"/>
 <layer number="46" name="Milling" color="3" fill="1" visible="no" active="yes"/>
-<layer number="47" name="Measures" color="7" fill="1" visible="no" active="yes"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="48" name="Document" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="49" name="Reference" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="50" name="dxf" color="7" fill="1" visible="no" active="no"/>
@@ -197,6 +197,8 @@
 <text x="179.07" y="113.665" size="1.778" layer="7">JP5</text>
 <text x="179.07" y="116.205" size="1.778" layer="7">JP6</text>
 <text x="81.915" y="162.56" size="1.778" layer="11">LE</text>
+<text x="83.82" y="-2.54" size="1.778" layer="47">39 (horizontal)</text>
+<text x="104.14" y="0" size="1.778" layer="47" rot="R90">22 (vertical)</text>
 </plain>
 <libraries>
 <library name="adafruit">
