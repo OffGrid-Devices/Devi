@@ -218,7 +218,8 @@ pip-log.txt
 
 
 # My Ignores
-_/
+_\datasheet
+_\prototype
 Devi_firmware/Devi_firmware/ArduinoCore/
 Devi_firmware/Devi_firmware/Devi_firmware/include/libraries/
 Devi_firmware/Devi_firmware/Devi_firmware/src/libraries/
