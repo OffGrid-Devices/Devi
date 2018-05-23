@@ -1,11 +1,11 @@
-#define BUTTON1 22
-#define BUTTON2 23
-#define BUTTON3 24
-#define BUTTON4 25
-#define BUTTON5 26
-#define BUTTON6 27
-#define BUTTON7 28
-#define BUTTON8 29
+#define BUTTON1 22 // PA0
+#define BUTTON2 23 // PA1
+#define BUTTON3 24 // PA2
+#define BUTTON4 25 // PA3
+#define BUTTON5 26 // PA4
+#define BUTTON6 27 // PA5
+#define BUTTON7 28 // PA6
+#define BUTTON8 29 // PA7
 
 void setup() {
   Serial.begin(9600);
