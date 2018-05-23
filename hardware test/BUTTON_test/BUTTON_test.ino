@@ -1,6 +1,3 @@
-// BUTTONuttons 1~6 on ports 14~19
-// BUTTONutton 7 on port 20
-// BUTTONutton 8 on port 21
 #define BUTTON1 22
 #define BUTTON2 23
 #define BUTTON3 24
