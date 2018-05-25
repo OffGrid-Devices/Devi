@@ -32,12 +32,31 @@
 void updateControl();
 //! Mozzi audio update. Where all audio calculations are processed. 
 int updateAudio();
-//! Update button values at CONTROL_RATE
+
+/*//! Update button values at CONTROL_RATE
 void updateButtons();
 //! Update potentiometer values at CONTROL_RATE
 void updateKnobs();
 //! Update rotary switch values at CONTROL_RATE
 void updateRotary();
+*/
+
+/*! Updates parameters according to mode. 
+*
+* This is the main function that selects which mode to run (sequencer, trigger, edit or save)
+*/
+void runMode(); 
+//! Sequencer function, updated in runMode() according to "mode" variable.
+void sequencer();
+//! Trigger function, updated in runMode() according to "mode" variable.
+void trigger();
+//! Edit function, updated in runMode() according to "mode" variable.
+void edit();
+//! Save function, updated in runMode() according to "mode" variable.
+void save();
+//! Load function loads presets using the rotary switch when in sequencer or trigger mode
+void load(int preset);
+
 
 //End of Auto generated function prototypes by Atmel Studio
 
@@ -65,6 +84,7 @@ void updateControl() {
 	_buttons = buttons; 
 	buttons = PINA;
 	// Update RotarySwitch 
+	_rotary = rotary; // set previous values for state change detection
 	for(int i = 0; i < ROTLOWER; i++){
 		if( bit_get(PINC, BIT(i)) ) rotary = i;
 	}
@@ -76,7 +96,7 @@ void updateControl() {
 		knobs[i] = mozziAnalogRead(i) >> 3 ; // convert from 0..1023 to 0..127
 	}
 	
-	// UPDATE UI VARIABLES
+	// Update UI Variable: Mode
 	if (buttons == B01111111 && buttons != _buttons) {
 		mode++; // increment mode
 		if(mode>NUMMODES-1) mode = 0; 
@@ -86,7 +106,8 @@ void updateControl() {
 		PORTE |= modeColors[mode]; // set RGB color
 	}
 	
-	 
+	if(mode < 2 && _rotary != rotary) load(rotary);
+	runMode(); // run main functions 
 	
 }
 
@@ -97,5 +118,39 @@ int updateAudio() {
 void loop() {
 	audioHook();
 }
+
+
+
+void runMode(){
+	switch(mode){
+		case 0: 
+			sequencer();
+			break;
+		case 1:	
+			trigger();
+			break;
+		case 2:
+			edit();
+			break;
+		case 3: 
+			save();
+			break; 
+		default:
+			break;
+	}
+}			
+	
+void sequencer(){}
+
+void trigger(){}
+
+void edit(){}
+	
+void save(){}
+
+void load(int preset){}
+
+
+
 
 #pragma GCC pop_options

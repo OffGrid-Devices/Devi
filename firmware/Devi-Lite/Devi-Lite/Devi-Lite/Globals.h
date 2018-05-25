@@ -52,9 +52,15 @@ uint8_t buttons;
 uint8_t _buttons; 
 
 //! Rotary switch value from 0 to 11
-uint8_t rotary;  
+uint8_t rotary; 
+
+//! Previous RotarySwitch value for state change detection
+uint8_t _rotary; 
 
 //! Knobs array with values from 0 to 127
+uint8_t knobs[NUMVOICES];
+
+//! Previous knob values for state change detection
 uint8_t knobs[NUMVOICES];
 
 //! Mode variable set by mode button 
