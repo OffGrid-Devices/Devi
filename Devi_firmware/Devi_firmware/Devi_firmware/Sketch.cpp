@@ -53,9 +53,9 @@ void readKnobs();
 // synth functions 
 void setMode();
 void runMode(); 
-void sequencer(); void trigger(); void editor(); void save(); 
-// synth utilities
-void incStep();
+void sequencerInterface(); void sequencer(); void incStep();
+void trigger(); void editor(); void save(); 
+
 //End of Auto generated function prototypes by Atmel Studio
 
 
@@ -207,15 +207,19 @@ void setMode(){
 void runMode(){
 	switch(mode){ // 0-Sequencer, 1-Trigger, 2-Edit, 3-Save
 		case 0: // Sequencer (green)
+			sequencerInterface();
 			sequencer();
 			break;
 		case 1: // Trigger (blue)
+			sequencer();
 			//trigger();
 			break;
 		case 2: // editor (white)
+			sequencer();
 			//metro.stop();
 			break;
 		case 3: // save (red)
+			sequencer();
 			//metro.stop();
 			break;
 		
@@ -224,7 +228,7 @@ void runMode(){
 	}
 }
 
-void sequencer(){
+void sequencerInterface(){
 	// set mutes and step length 
 	if(!button[7].state){
 		for(int i = 0; i < 6; i++){
@@ -296,7 +300,9 @@ void sequencer(){
 	
 	// release select lock
 	if(!button[6].state) selectLock = false;
-		
+}
+
+void sequencer(){
 	// sequencer update
 	if ( metro.ready() ){
 		
