@@ -1,4 +1,4 @@
-﻿// TODO: [p1nh0] make sin table 14-bit instead of 8-bit?
+﻿// TODO: make sin table 14-bit instead of 8-bit?
 
 /*Begining of Auto generated code by Atmel studio */
 #include <Arduino.h>
@@ -6,7 +6,8 @@
 
 /*
 OffGrid-Devices Devi revB : Arduino+Mozzi based synthesizer
-by p1nh0 2018
+firmware version 0.1
+by OffGrid-Devices (Tiago Angelo 2018)
 
 Mozzi lib by Tim Barrass
 Mozzi AUDIO_RATE = 32768Hz
@@ -339,7 +340,7 @@ void sequencer(){
 			voice[step].setPitch( p.pitch[step] );
 			
 			//if ( mute[step] )   voice[step].noteOff();
-			if ( p.mute[step] )   voice[step].startDCA();
+			if ( p.mute[step] )   voice[step].triggerEnv();
 			if ( p.steps > 1 ) incStep();
 			//if ( mute[step] )   voice[step].noteOn();
 		}

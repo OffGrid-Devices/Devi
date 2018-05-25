@@ -28,8 +28,6 @@ void Voice::init(uint8_t pitch, uint16_t ctrl_rate){
 	dca = new Ead(ctrl_rate);
 	att=25, dcy=450;
 	
-	env.setADLevels(255, 255);
-	env.setTimes(att, 25, 500, dcy);  
 }
 
 void Voice::setPitch(uint8_t note){
@@ -41,7 +39,7 @@ int Voice::next(){
 	//return carrier.next() * env.next();
 }
 
-void Voice::startDCA(){
+void Voice::triggerEnv(){
 	dca->start(att, dcy);
 }
 
@@ -49,16 +47,5 @@ void Voice::updateEnvelopes(){
 	gain = dca->next();
 }
 
-void Voice::noteOn(){
-	env.noteOn();
-}
-
-void Voice::noteOff(){
-	env.noteOff();	
-}
-
-void Voice::updateEnv(){
-	env.update();
-}
 
 #pragma GCC pop_options

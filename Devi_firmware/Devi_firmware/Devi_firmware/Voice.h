@@ -27,7 +27,7 @@ class Voice
 	private:
 	Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier;
 	Ead* dca;
-	ADSR<CONTROL_RATE, AUDIO_RATE> env; 
+	//ADSR<CONTROL_RATE, AUDIO_RATE> env; 
 	int gain;
 	unsigned int att, dcy;
 	//functions
@@ -37,11 +37,8 @@ class Voice
 	void init(uint8_t pitch, uint16_t ctrl_rate);
 	void setPitch(uint8_t freq);
 	int next();
-	void startDCA();
+	void triggerEnv();
 	void updateEnvelopes();
-	void noteOn();
-	void noteOff();
-	void updateEnv();
 	
 	protected:
 	private:
