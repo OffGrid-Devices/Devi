@@ -3,9 +3,6 @@
 * \brief Hardware description.
 * This file contains hardware pin mappings used in the Devi synthesiser.
 *
-* \version 1.0
-* \date 23/05/2018 03:54
-* \author Tiago Angelo (OffGrid-Devices)
 */
 
 
