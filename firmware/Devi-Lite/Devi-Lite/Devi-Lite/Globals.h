@@ -82,12 +82,11 @@ uint8_t mode;
 
 //! Mode button locked?
 boolean modeLock = false;
-//! Previous Mode lock
-boolean _modeLock = true;
 //! Function button locked ? 
 boolean functionLock = false; 
-//! Previous Function lock
-boolean _functionLock = true;
+//! Parameter changed ? 
+boolean paramChange = false;
+
 
 /*! \brief Mode led (rgb) colors
 *
@@ -107,7 +106,7 @@ uint8_t modeColors[NUMMODES] = {B00100000, B00010000, B00111000, B00001000};
 
 //! \brief Step mutes
 //boolean stepMute[6] = {false, false, false, false, false, false};
-uint8_t stepMutes = B00000000; 
+uint8_t stepMutes = B00000000;
 //! \brief Current sequencer step
 int8_t step = 0;
 //! \brief Selected number of steps

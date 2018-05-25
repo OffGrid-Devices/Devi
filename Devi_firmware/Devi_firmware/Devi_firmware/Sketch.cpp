@@ -14,13 +14,10 @@ Mozzi mode = HIFI
 Mozzi version = master(22-04-2018)
 */
 
-
 #include "DeviHardware.h"
 
 #pragma GCC push_options
 #pragma GCC optimize (OPTIMIZATION)
-
-
 
 #define CONTROL_RATE 512 // must be called above MozziGuts because of my code architecture....
 // 512 is optimal for Ead
@@ -29,7 +26,7 @@ Mozzi version = master(22-04-2018)
 #include <MozziGuts.h>
 #include <mozzi_rand.h>
 #include <mozzi_fixmath.h>
-
+#include <EEPROM.h>
 #include "Button.h"
 #include "Potentiometer.h"
 #include "Voice.h"
@@ -50,11 +47,15 @@ void voiceSetup();
 // controls
 void readButtons();
 void readKnobs();
+void readRotary(); 
 // synth functions 
 void setMode();
 void runMode(); 
 void sequencerInterface(); void sequencer(); void incStep();
-void trigger(); void editor(); void save(); 
+void trigger(); 
+void editor(); 
+void save(); // save variables to EEPROM 
+void load(); // load variables from EEPROM
 
 //End of Auto generated function prototypes by Atmel Studio
 
@@ -166,7 +167,15 @@ void readKnobs(){
 	knob[4].read();
 	knob[5].read();
 }
-
+void readRotary(){
+	_rotary = rotary; // set previous values for state change detection
+	for(int i = 0; i < 8; i++){
+		if( bit_get(PINC, BIT(i)) ) rotary = i; 
+	}
+	for(int i = 0; i < 4; i++){
+		if( bit_get(PIND, BIT(i)) ) rotary = i+8;
+	}
+}
 //////////////////////////////////////////////////////////////////////////
 // MODE /////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
@@ -406,6 +415,11 @@ void editor(){}
 // SAVE //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 void save(){}
+	
+//////////////////////////////////////////////////////////////////////////
+// LOAD //////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+void load(){}
 
 
 //////////////////////////////////////////////////////////////////////////
