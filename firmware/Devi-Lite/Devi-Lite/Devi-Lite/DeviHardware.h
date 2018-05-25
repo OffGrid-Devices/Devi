@@ -58,21 +58,21 @@
 #define PINLED1 17
 //! LED 2 (PH1)
 #define PINLED2 16
-//! LED 3 (PH2)
+//! LED 3 (PH3)
 #define PINLED3 6
-//! LED 4 (PH3) 
+//! LED 4 (PH4) 
 #define PINLED4 7
-//! LED 5 (PH4) 
+//! LED 5 (PH5) 
 #define PINLED5 8
-//! LED 6 (PH5) 
+//! LED 6 (PH6) 
 #define PINLED6 9 
 //! Function LED (PB4)
 #define PINLED7 10
 // Mode RGB LED - red (PE3)
 #define PINRED 5 
-// Mode RGB LED - green (PE3)
+// Mode RGB LED - green (PE5)
 #define PINGREEN 3
-// Mode RGB LED - blue (PE3)
+// Mode RGB LED - blue (PE4)
 #define PINBLUE 2 
 /*! @} */
 
