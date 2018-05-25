@@ -349,12 +349,12 @@ void sequencer(){
 		}
 		seqTrigger = !seqTrigger;
 	}
-	voice[0].updateEnvelopes();
-	voice[1].updateEnvelopes();
-	voice[2].updateEnvelopes();
-	voice[3].updateEnvelopes();
-	voice[4].updateEnvelopes();
-	voice[5].updateEnvelopes();
+	voice[0].updateEnvelope();
+	voice[1].updateEnvelope();
+	voice[2].updateEnvelope();
+	voice[3].updateEnvelope();
+	voice[4].updateEnvelope();
+	voice[5].updateEnvelope();
 	// ADSR
 	/*voice[0].updateEnv();
 	voice[1].updateEnv();

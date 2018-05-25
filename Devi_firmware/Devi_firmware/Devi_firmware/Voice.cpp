@@ -22,12 +22,11 @@ Voice::~Voice()
 {
 } //~Voice
 
-void Voice::init(uint8_t pitch, uint16_t ctrl_rate){
+void Voice::init(uint8_t note, uint16_t ctrl_rate){
 	carrier.setTable(SIN2048_DATA);
-	carrier.setFreq( mtof(pitch) );
+	carrier.setFreq( mtof(note) );
 	dca = new Ead(ctrl_rate);
 	att=25, dcy=450;
-	
 }
 
 void Voice::setPitch(uint8_t note){
@@ -43,7 +42,7 @@ void Voice::triggerEnv(){
 	dca->start(att, dcy);
 }
 
-void Voice::updateEnvelopes(){
+void Voice::updateEnvelope(){
 	gain = dca->next();
 }
 

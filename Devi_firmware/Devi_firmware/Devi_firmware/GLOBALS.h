@@ -56,7 +56,7 @@ unsigned int dcy[6] = {150, 150, 150, 150, 150, 150};
 uint8_t fxtype[6]; // 0-OFF, 1-<<, 2->>, 3-&, 4-|, 5-^
 uint8_t fxamount[6]; // fx parameter/amount
 // FILTER 
-uint8_t filtertype[6];// 0-LP, 1-BAND, 1-HP
+uint8_t filtertype[6];// 0-LP, 1-BAND, 1-HP, 2-NOTCH
 uint16_t filterfreq[6] = {12000, 12000, 12000, 12000, 12000, 12000, }; // filter cutoff frequency
 uint8_t filterres[6] = {127, 127, 127, 127, 127, 127}; // filter resonance
 int8_t filtermod[6]; // LFO to filter modulation amount	
