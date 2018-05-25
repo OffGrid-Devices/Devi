@@ -9,7 +9,7 @@
 #define ROT9 21
 #define ROT10 20
 #define ROT11 19
-#define ROT12 18
+#define ROT12 18 //
 
 void setup() {
   Serial.begin(9600);

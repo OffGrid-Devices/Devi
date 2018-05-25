@@ -1,13 +1,13 @@
-#define LED1 17
-#define LED2 16
-#define LED3 6 
-#define LED4 7
-#define LED5 8 
-#define LED6 9
-#define LED7 10
-#define LEDR 5
-#define LEDG 3
-#define LEDB 2
+#define LED1 17 // PH0
+#define LED2 16 // PH1
+#define LED3 6 // PH3
+#define LED4 7 // PH4
+#define LED5 8 // PH5
+#define LED6 9 // PH6
+#define LED7 10 // PB4
+#define LEDR 5 // PE3
+#define LEDG 3 // PE4
+#define LEDB 2 // PE5
 
 int dly = 500;
 
