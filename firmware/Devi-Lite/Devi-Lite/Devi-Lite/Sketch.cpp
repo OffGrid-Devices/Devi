@@ -78,7 +78,7 @@ Voice voice[NUMVOICES];
 IntMap mapFilterFreq(0, 255, MINFILTER, MAXFILTER); 
 
 void setup() {
-	Serial.begin(9600);
+	if(DEBUG) Serial.begin(9600);
 	startMozzi(CONTROL_RATE); // setup mozzi 
 	setupFastAnalogRead(FASTEST_ADC); // use mozzi analogRead
 	
@@ -167,8 +167,6 @@ void loop() {
 	audioHook();
 }
 
-
-
 void runMode(){
 	switch(mode){
 		case 0: 
@@ -204,19 +202,20 @@ void updateSequencer(){
 		else metro.stop();
 	}
 	
-	// Run 6-voice iteration if neither the Mode nor the Function button are pressed
-	if(buttons >= B11000000){ 
+	// Regular controls (no combos)
+	if(!modeLock && !functionLock){ 
 		for(int i = 0; i < NUMVOICES; i++){
-			// set mutes
-			if(bit_get(buttons, i) < 1 && bit_get(buttons, i) != bit_get(_buttons, i) ){
-				stepMutes ^= BIT(i); // flip bit(i)
-			}
-			// set pitch
+			// Update pitch
 			if(knobs[i] != _knobs[i]){
-				voice[i].setPitch(knobs[i] >> 2); 			
+				voice[i].setPitch(knobs[i] >> 2);
 			}
 		}
+		if(buttons != _buttons){
+			stepMutes ^= (255-buttons);
+			Serial.println(stepMutes, BIN);
+		}
 	}
+	/*
 	// FUNCTION Combos
 	if( !bit_get(buttons, 6)){ // while FUNCTION button is pressed
 		// knob 1 sets bpm
@@ -257,11 +256,6 @@ void updateSequencer(){
 				//TODO: check if res=0 is glitching...
 			}
 		}
-		
-		// Set Step Mutes
-		for(int i = 0; i < NUMVOICES; i++){
-			if(bit_get(buttons, i) != bit_get(_buttons, i)) stepMutes ^= BIT(i);
-		}
 	}
 	
 	// MODE Combos
@@ -269,7 +263,7 @@ void updateSequencer(){
 		for(int i = 0; i < NUMVOICES; i++){
 			if(bit_get(buttons, i)) mode = i;
 		}	
-	}
+	}*/
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -286,7 +280,7 @@ void runSequencer(){
 			   ledsOn();
 			   // turn off leds if muted
 			   for(int i = 0; i < NUMVOICES; i++){
-				   if(bit_get(stepMutes, i)) cbi(PORTH, ledSequence[i]);
+				   if( bit_get(stepMutes, BIT(i)) ) cbi(PORTH, ledSequence[i]);
 			   }
 			   // turn off led on current step 
 			   cbi(PORTH, ledSequence[step]);
@@ -302,7 +296,7 @@ void runSequencer(){
 			   PORTH = leds;*/
 			}
 			// Trigger Envelopes 
-			if(!bit_get(stepMutes, step)) voice[step].startDCA();
+			if(!bit_get(stepMutes, BIT(step))) voice[step].startDCA();
 			// Increment Step
 			if ( steps > 1 ) incStep();
 		}

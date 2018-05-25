@@ -27,6 +27,9 @@
 //! Compiler optimization flag
 #define OPTIMIZATION "O3"
 
+//! Activate Serial ?
+#define DEBUG 1
+
 //! Total number of Modes
 #define NUMMODES 4
 
