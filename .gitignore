@@ -223,3 +223,14 @@ _\prototype
 Devi_firmware/Devi_firmware/ArduinoCore/
 Devi_firmware/Devi_firmware/Devi_firmware/include/libraries/
 Devi_firmware/Devi_firmware/Devi_firmware/src/libraries/
+firmware/Devi-Lite/Devi-Lite/ArduinoCore/
+firmware/Devi-Lite/Devi-Lite/Devi-Lite/include/libraries/
+firmware/Devi-Lite/Devi-Lite/Devi-Lite/src/libraries/
+firmware/Devi-Lite/Devi-Lite/Devi-Lite/doxygen/
+firmware/Devi-Lite/Devi-Lite/Devi-Lite/doxyfile
+*.xml
+*.cppproj
+*.atsuo
+*.atsln
+*.s#*
+*.b#*
