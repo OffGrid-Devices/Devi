@@ -44,13 +44,24 @@ void updateRotary();
 
 void setup() {
 	startMozzi(CONTROL_RATE);
-	//Serial.begin(9600);
-	DDRA = B00000000; // Set all button pins as inputs 
+	Serial.begin(9600);
+	DDRA = B00000000; // Set all button pins as inputs
+	DDRC = B00000000; // Set rotary switch 1~8 pins as inputs 
+	DDRD = DDRD & B00001111; // Set rotary switch 9~12 pins as inputs (without changing the remaining pins on the same port)
 }
 
 
 void updateControl() {
-	buttons = PINA; // Update buttons 
+	// Update buttons
+	buttons = PINA;
+	// Update rotary switch 
+	for(int i = 0; i < ROTLOWER; i++){
+		if( bit_get(PINC, BIT(i)) ) rotary = i;
+	}
+	for(int i = 0; i < ROTUPPER; i++){
+		if( bit_get(PIND, BIT(i)) ) rotary = i+ROTLOWER;
+	}
+
 }
 
 int updateAudio() {
