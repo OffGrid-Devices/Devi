@@ -13,53 +13,48 @@
 #define OPTIMIZATION "O3"
 
 //HARDWARE
-// buttons
-/*PL0 ( ICP4 ) Digital pin 49
-36 PL1 ( ICP5 ) Digital pin 48
-37 PL2 ( T5 ) Digital pin 47
-38 PL3 ( OC5A ) Digital pin 46 (PWM)
-39 PL4 ( OC5B ) Digital pin 45 (PWM)
-40 PL5 ( OC5C ) Digital pin 44 (PWM)
-41 PL6 Digital pin 43
-42 PL7 Digital pin 42*/
-#define PINBUT1 14
-#define PINBUT2 15
-#define PINBUT3 16
-#define PINBUT4 17
-#define PINBUT5 18
-#define PINBUT6 19
-#define PINBUT7 20
-#define PINBUT8 21
-// potentiometers
-#define PINPOT1 A0
-#define PINPOT1 A1
-#define PINPOT1 A2
-#define PINPOT1 A3
-#define PINPOT1 A4 
-#define PINPOT1 A5
-#define PINPOT1 A6
-// led's (to sequence)
-/*PC0 ( A8 ) Digital pin 37
-54 PC1 ( A9 ) Digital pin 36
-55 PC2 ( A10 ) Digital pin 35
-56 PC3 ( A11 ) Digital pin 34
-57 PC4 ( A12 ) Digital pin 33
-58 PC5 ( A13 ) Digital pin 32
-59 PC6 ( A14 ) Digital pin 31
-60 PC7 ( A15 ) Digital pin 30 */ 
-#define PINLED1 10
-#define PINLED2 9
-#define PINLED3 8
-#define PINLED4 7
-#define PINLED5 6
-#define PINLED6 5
-#define PINLED7 13
-/*43 PD0 ( SCL/INT0 ) Digital pin 21 (SCL)
-44 PD1 ( SDA/INT1 ) Digital pin 20 (SDA)
-45 PD2 ( RXDI/INT2 ) Digital pin 19 (RX1)
-46 PD3 ( TXD1/INT3 ) Digital pin 18 (TX1)*/
-#define PINRED 2
-#define PINGREEN 3 
-#define PINBLUE 4
+// Port A - Buttons
+#define PINBUT1 22 // PA0
+#define PINBUT2 23 // PA1
+#define PINBUT3 24 // PA2
+#define PINBUT4 25 // PA3
+#define PINBUT5 26 // PA4
+#define PINBUT6 27 // PA5
+#define PINBUT7 28 // PA6
+#define PINBUT8 29 // PA7
+// Port F - Potentiometers
+#define PINPOT1 A0 // PF0
+#define PINPOT2 A1 // PF1
+#define PINPOT3 A2 // PF2
+#define PINPOT4 A3 // PF3
+#define PINPOT5 A4 // PF4
+#define PINPOT6 A5 // PF5
+// PORT H - Leds
+#define PINLED1 17 // PH0
+#define PINLED2 16 // PH1
+#define PINLED3 6 // PH3
+#define PINLED4 7 // PH4
+#define PINLED5 8 // PH5
+#define PINLED6 9 // PH6
+// PORT B - Led#7
+#define PINLED7 10 // PB4
+// PORT E - Led RGB
+#define PINRED 5 // PE3
+#define PINGREEN 3 // PE4 
+#define PINBLUE 2 // PE5
+// PORT C & D - Rotary switch
+#define PINROT1 37 // PC0
+#define PINROT2 36 // PC1
+#define PINROT3 35 // PC2
+#define PINROT4 34 // PC3
+#define PINROT5 33 // PC4
+#define PINROT6 32 // PC5
+#define PINROT7 31 // PC6
+#define PINROT8 30 // PC7
+#define PINROT9 21 // PD0
+#define PINROT10 20 // PD1
+#define PINROT11 19 // PD2
+#define PINROT12 18 // PD3
+
 
 #endif /* GLOBALS_H_ */

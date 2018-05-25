@@ -34,6 +34,7 @@ class Voice
 	public:
 	Voice();
 	~Voice();
+	void init(uint8_t pitch, uint16_t ctrl_rate);
 	void setPitch(uint8_t freq);
 	int next();
 	void startDCA();
