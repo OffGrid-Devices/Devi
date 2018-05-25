@@ -29,13 +29,8 @@ void Voice::init(uint8_t note, uint16_t ctrl_rate){
 	att=25, dcy=450;
 }
 
-void Voice::setPitch(uint8_t note){
-	carrier.setFreq( mtof(note) );
-}
-
 int Voice::next(){
 	return (carrier.next() * gain);
-	//return carrier.next() * env.next();
 }
 
 void Voice::triggerEnv(){
@@ -44,6 +39,78 @@ void Voice::triggerEnv(){
 
 void Voice::updateEnvelope(){
 	gain = dca->next();
+}
+
+void Voice::updateLFO(){
+
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
+// Set oscillator parameters
+void Voice::setPitch(uint8_t note){
+	carrier.setFreq( mtof(note) );
+}
+
+void Voice::setCarrierWave(uint8_t w){
+	
+}
+
+void Voice::setModulatorPitch(uint8_t note){
+	
+}
+
+void Voice::setModulatorWave(uint8_t w){
+	
+}
+
+// Set LFO parameters
+void Voice::setLFOWave(uint8_t){
+	
+}
+
+void Voice::setLFOFreq(uint16_t f){
+	
+}
+
+// Set envelope parameters
+void Voice::setEnvAttack(unsigned int a){
+	
+}
+void Voice::setEnvDecay(unsigned int d){
+	
+}
+
+// Set filter parameters
+void Voice::setFilterType(uint8_t t){
+	
+}
+void Voice::setFilterFreq(uint16_t f){
+	
+}
+void Voice::setFilterRes(uint8_t r){
+	
+}
+void setFilterMod(int8_t m){
+	
+}
+
+// Set fx parameters
+void Voice::setFXType(uint8_t t){
+	
+}
+void setFXAmount(uint8_t a){
+	
+}
+
+// Set modulation parameters
+void Voice::setFilterModAmount(int8_t m){
+	
+}
+void Voice::setModulatorAmount(int8_t m){
+	
 }
 
 
