@@ -17,7 +17,13 @@
 #include <Ead.h>
 #include <ADSR.h>
 #include <mozzi_midi.h>
+// wavetables 
 #include "tables/sin2048_int8.h"
+#include "tables/triangle_valve_2_2048_int8.h"
+#include "tables/triangle_dist_cubed_2048_int8.h"
+#include "tables/saw2048_int8.h"
+#include "tables/square_no_alias_2048_int8.h"
+#include "tables/pinknoise8192_int8.h"
 
 class Voice
 {
