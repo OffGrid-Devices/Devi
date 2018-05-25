@@ -1,16 +1,13 @@
 /*!
 * \file DeviHardware.h
-* \brief Hardware description.
-* This file contains hardware pin mappings used in the Devi synthesiser.
-*
+* \brief Hardware description file.
+* This file contains hardware pin mappings used in the Devi synthesiser. 
+*\n It is not supposed to be included in the main Sketch.cpp file as hardware variables are read via ports, instead serves only as a referemce.
 */
 
 
 #ifndef DEVIHARDWARE_H_
 #define DEVIHARDWARE_H_
-
-//COMPILER
-//#define OPTIMIZATION "O3"
 
 /*! \defgroup Buttons
 * Buttons are mapped to pins on PORT A.

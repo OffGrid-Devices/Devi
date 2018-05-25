@@ -19,6 +19,8 @@
 
 /*End of auto generated code by Atmel studio */
 
+#pragma GCC push_options
+#pragma GCC optimize (OPTIMIZATION)
 
 #include <MozziGuts.h> // at the top of your sketch
 #include "DeviHardware.h"
@@ -41,26 +43,22 @@ void updateRotary();
 
 
 void setup() {
-	//startMozzi(CONTROL_RATE);
-	Serial.begin(9600);
-	DDRA = B00000000; // set all pins as inputs 
+	startMozzi(CONTROL_RATE);
+	//Serial.begin(9600);
+	DDRA = B00000000; // Set all button pins as inputs 
 }
 
 
-/*void updateControl() {
-	//! Update button values at CONTROL_RATE
-	buttons = PINA;
-	 
-}*/
+void updateControl() {
+	buttons = PINA; // Update buttons 
+}
 
-/*int updateAudio() {
+int updateAudio() {
 	return 0;
-}*/
+}
 
 void loop() {
-	//audioHook();
-	buttons = PINA;
-	Serial.println(buttons, BIN);
+	audioHook();
 }
 
-
+#pragma GCC pop_options

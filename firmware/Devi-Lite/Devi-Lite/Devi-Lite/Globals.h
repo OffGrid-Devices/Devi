@@ -8,8 +8,14 @@
 #ifndef GLOBALS_H_
 #define GLOBALS_H_
 
-//! Control update rate in Hertz (must be a power of 2)
+//! Control update rate in Hertz (must be a power of 2).
 #define CONTROL_RATE 512
+
+//! Compiler optimization flag
+#define OPTIMIZATION "O3"
+
+//! Total number of voices. This value will be often used as there are not only 6 voices, but 6 leds, 6 potentiometers, etc.
+#define NUMVOICES 6
 
 /*! 8-bit variable containing all 8 buttons values.
 * 
