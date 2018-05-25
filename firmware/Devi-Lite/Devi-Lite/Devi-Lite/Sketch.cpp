@@ -198,7 +198,7 @@ void runMode(){
 void updateSequencer(){
 	
 	// Sequencer Start/Stop
-	if(buttons == B10111111 && buttons != _buttons){
+	if(!functionLock && buttons==B11111111 && _buttons==B10111111){
 		seqOnOff = !seqOnOff; 
 		if(seqOnOff) metro.start(); 
 		else metro.stop();
