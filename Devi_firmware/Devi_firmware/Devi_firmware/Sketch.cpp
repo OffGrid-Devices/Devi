@@ -14,24 +14,26 @@ Mozzi mode = HIFI
 Mozzi version = master(22-04-2018)
 */
 
-#include "GLOBALS.h"
+
+#include "DeviHardware.h"
 
 #pragma GCC push_options
 #pragma GCC optimize (OPTIMIZATION)
 
 
-#define CONTROL_RATE 512
+
+#define CONTROL_RATE 512 // must be called above MozziGuts because of my code architecture....
 // 512 is optimal for Ead
 // 64 is optimal for ADSR
 
 #include <MozziGuts.h>
-#include <Metronome.h>
 #include <mozzi_rand.h>
 #include <mozzi_fixmath.h>
 
 #include "Button.h"
 #include "Potentiometer.h"
 #include "Voice.h"
+#include "GLOBALS.h"
 
 
 //Beginning of Auto generated function prototypes by Atmel Studio
@@ -50,38 +52,20 @@ void readButtons();
 void readKnobs();
 // synth functions 
 void setMode();
-void execMode(); 
-void execMode0(); void execMode1(); void execMode2(); void execMode3(); 
-void execMode4(); void execMode5(); void execMode6(); void execMode7();
+void runMode(); 
+void sequencer(); void trigger(); void editor(); void save(); 
 // synth utilities
 void incStep();
 //End of Auto generated function prototypes by Atmel Studio
 
-Voice voice[6];
 
-// SYNTH VARIABLES
-unsigned int att=25, dcy=150;
-uint8_t pitch[6] = {36, 39, 43, 46, 48, 29};
-
-boolean mute[6] = {true, true, true, true, true, true}; // step mute 
-int8_t step = 0; // current sequencer step
-uint8_t steps = 6; // selected number of steps 
-uint16_t bpm = 4*120, _bpm = bpm; 
-boolean seqTrigger = 1; // actually runs at twice the audible sequencer rate to turn bpm led indicator on/off (1-triggers envelopes and led on; 0- triggers led off)
-Metronome metro(60000/bpm/2); // 120bpm
-boolean seqSwitch = true; // is sequencer On ? 
-uint8_t stepMode = 0; // up, down, up&down, palindrome, random step, random step & pitch
-boolean stepDir = 1; // 1-up, 0-down
-uint8_t ledPinSequence[6] = {PINLED1, PINLED2, PINLED3, PINLED4, PINLED5, PINLED6};
-	
-uint8_t filter_mode; // 0-LP, 1-BAND, 1-HP
-uint8_t fx_mode; // 0-OFF, 1-<<, 2->>, 3-&, 4-|, 5-^
-uint8_t exec_mode = 7; // 0-ExtSeq, 1-IntSeq, 2-RndSeq, 3-Stack, 4-Arp, 5-Play, 6-Rnd, 7-Sys 
-
-// HARDWARE VARIABLES
+// HARDWARE CLASSES
 Button button[8];
 boolean selectLock = false, modeLock = false;
 Potentiometer knob[8];
+
+// SYNTH CLASSES
+Voice voice[6];
 
 void setup(){
 	ledSetup();
@@ -98,9 +82,8 @@ void updateControl(){
 	readButtons();
 	readKnobs();
 	setMode();
-	execMode();
+	runMode();
 }
-
 
 int updateAudio(){ 
 	return ( (long)	voice[0].next() + 
@@ -154,6 +137,8 @@ void ledSetup(){
 	pinMode(PINLED5, OUTPUT);
 	pinMode(PINLED6, OUTPUT);
 	pinMode(PINLED7, OUTPUT);
+	
+	setRGB(LOW, HIGH, LOW); // start with sequencer
 }
 void knobSetup(){
 	knob[0].init(A0);
@@ -196,75 +181,50 @@ void setMode(){
 	if (button[7].changed && !button[7].state && !modeLock) // trigger on button released
 	{
 		allLedsOff();
-		exec_mode++;
-		if(exec_mode>7) exec_mode = 0;
+		mode++;
+		if(mode>3) mode = 0;
 		
-		switch(exec_mode){ // 1-IntSeq, 2-RndSeq, 3-Stack, 4-Arp, 5-Play, 6-Rnd, 7-Sys
-			case 0: // external sequencer (red)
-			setRGB(HIGH, LOW, LOW);
-			break;
-			case 1: // internal sequencer (orange)
-			setRGB(HIGH, HIGH, LOW);
-			if(seqTrigger) metro.start();
-			break;
-			case 2: // randomize sequence (purple)
-			setRGB(HIGH, LOW, HIGH);
-			break;
-			case 3: // external play stack notes (green)
-			setRGB(LOW, HIGH, LOW);
-			break;
-			case 4: // external play arpeggio (cian)
-			setRGB(LOW, HIGH, HIGH);
-			break;
-			case 5: // internal play (blue)
-			setRGB(LOW, LOW, HIGH);
-			break;
-			case 6: // randomize synth (white)
-			setRGB(HIGH, HIGH, HIGH);
-			break;
-			case 7: // system (off)
-			setRGB(LOW, LOW, LOW);
-			break;
+		switch(mode){ // 0-Sequencer, 1-Trigger, 2-Edit, 3-Save
+			case 0: // Sequencer (green)
+				setRGB(LOW, HIGH, LOW);
+				break;
+			case 1: // Trigger (blue) 
+				setRGB(LOW, LOW, HIGH);
+				//if(seqTrigger) metro.start();
+				break;
+			case 2: // Edit (white)
+				setRGB(HIGH, HIGH, HIGH);
+				break;
+			case 3: // Save (red)
+				setRGB(HIGH, LOW, LOW);
+				break;
 			
 			default:
 			break;
 		}
 	}
 }
-void execMode(){
-	switch(exec_mode){ // 1-IntSeq, 2-RndSeq, 3-Stack, 4-Arp, 5-Play, 6-Rnd, 7-Sys
-		case 0: // external sequencer (red)
-		metro.stop();
-		break;
-		case 1: // internal sequencer (orange)
-		execMode1();
-		break;
-		
-		case 2: // randomize sequence (purple)
-		metro.stop();
-		break;
-		case 3: // external play stack notes (green)
-		metro.stop();
-		break;
-		case 4: // external play arpeggio (cian)
-		metro.stop();
-		break;
-		case 5: // internal play (blue)
-		metro.stop();
-		break;
-		case 6: // randomize synth (white)
-		metro.stop();
-		break;
-		case 7: // system (off)
-		metro.stop();
-		break;
+void runMode(){
+	switch(mode){ // 0-Sequencer, 1-Trigger, 2-Edit, 3-Save
+		case 0: // Sequencer (green)
+			sequencer();
+			break;
+		case 1: // Trigger (blue)
+			//trigger();
+			break;
+		case 2: // editor (white)
+			//metro.stop();
+			break;
+		case 3: // save (red)
+			//metro.stop();
+			break;
 		
 		default:
 		break;
 	}
 }
 
-void execMode1(){
+void sequencer(){
 	// set mutes and step length 
 	if(!button[7].state){
 		for(int i = 0; i < 6; i++){
@@ -308,9 +268,9 @@ void execMode1(){
 	// set sequencer start/stop
 	if( button[6].changed && !selectLock && !button[6].state) // trigger on button released
 	{
-		seqSwitch = !seqSwitch;
+		seqOnOff = !seqOnOff;
 			
-		if ( seqSwitch ) 
+		if ( seqOnOff ) 
 		{
 			metro.start();
 		}
