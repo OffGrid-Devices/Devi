@@ -120,8 +120,8 @@ void updateControl() {
 	// Read Buttons
 	_buttons = buttons; 
 	buttons = PINA;
-	modeLock = !bit_get(buttons, 7); // set Mode lock
-	functionLock = !bit_get(buttons, 6); // set Function lock 
+	modeLock = !bit_get(buttons, BIT(7)); // set Mode lock
+	functionLock = !bit_get(buttons, BIT(6)); // set Function lock 
 	
 	// Read RotarySwitch 
 	_rotary = rotary; // set previous values for state change detection
@@ -136,20 +136,21 @@ void updateControl() {
 		_knobs[i] = knobs[i]; 
 		knobs[i] = mozziAnalogRead(i) >> 2 ; // convert from 0..1023 to 0..255
 	}
-	
-	if (buttons == B11111111 && _buttons == B01111111) { // if Mode button released
+	//TODO: if(mode < 2 && _rotary != rotary) load(rotary); // load preset
+	if (buttons == B11111111 && _buttons == B01111111 && !paramChange) { // if Mode button released
 		ledsOff();
-		modeLock == false; 
+		modeLock == false;
 		mode++; // increment mode
-		if(mode>NUMMODES-1) mode = 0; 
+		if(mode>NUMMODES-1) mode = 0;
 		cbi(PORTE, 3); // clear RGB pins
-		cbi(PORTE, 4); 
+		cbi(PORTE, 4);
 		cbi(PORTE, 5);
 		PORTE |= modeColors[mode]; // set RGB color
 	}
 	
-	//TODO: if(mode < 2 && _rotary != rotary) load(rotary); // load preset
 	runMode(); // run main functions 
+	
+	
 }
 
 int updateAudio() {
@@ -196,10 +197,10 @@ void runMode(){
 void updateSequencer(){
 	
 	// Sequencer Start/Stop
-	if(!functionLock && buttons==B11111111 && _buttons==B10111111){
+	if(!functionLock && buttons==B11111111 && _buttons==B10111111){ // start/stop on Function button release
 		seqOnOff = !seqOnOff; 
 		if(seqOnOff) metro.start(); 
-		else metro.stop();
+		else metro.stop(); cbi(PORTB, 4);
 	}
 	
 	// Regular controls (no combos)
@@ -210,6 +211,7 @@ void updateSequencer(){
 				voice[i].setPitch(knobs[i] >> 2);
 			}
 		}
+		// Update Mutes 
 		if(buttons != _buttons){
 			stepMutes ^= (255-buttons);
 			Serial.println(stepMutes, BIN);
@@ -257,13 +259,14 @@ void updateSequencer(){
 			}
 		}
 	}
-	
+	*/
 	// MODE Combos
-	if(!bit_get(buttons, 7)){ // while MODE button is pressed
+	ifif(!bit_get(buttons, BIT(7))){ // while MODE button is pressed // while MODE button is pressed
+		paramChange = false; 
 		for(int i = 0; i < NUMVOICES; i++){
-			if(bit_get(buttons, i)) mode = i;
-		}	
-	}*/
+			if(bit_get(buttons, BIT(i))) stepMode = i; paramChange = true; 
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

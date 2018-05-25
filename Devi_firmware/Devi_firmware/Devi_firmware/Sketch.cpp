@@ -60,20 +60,34 @@ void load(); // load variables from EEPROM
 //End of Auto generated function prototypes by Atmel Studio
 
 
+
+//////////////////////////////////////////////////////////////////////////
+// CLASSES //////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+
 // HARDWARE CLASSES
 Button button[8];
 boolean selectLock = false, modeLock = false;
 Potentiometer knob[8];
-
 // SYNTH CLASSES
 Voice voice[6];
+// PRESET STRUCT
+Preset p;
+
+
+
+//////////////////////////////////////////////////////////////////////////
+// MAIN FUNCTIONS ///////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 void setup(){
 	ledSetup();
 	buttonSetup();
 	knobSetup();
 	voiceSetup();
-	//Serial.begin(9600);
+	/*Serial.begin(9600);
+	Serial.print("size of struct=");
+	Serial.println(sizeof(p));*/
 	randSeed();
 	startMozzi(CONTROL_RATE);
 	setupFastAnalogRead(FASTEST_ADC);
@@ -82,6 +96,7 @@ void setup(){
 void updateControl(){
 	readButtons();
 	readKnobs();
+	readRotary();
 	setMode();
 	runMode();
 }
@@ -139,7 +154,7 @@ void knobSetup(){
 void voiceSetup(){
 	for (int i = 0; i < 6; i++)
 	{
-		voice[i].init(pitch[i], CONTROL_RATE);	
+		voice[i].init(p.pitch[i], CONTROL_RATE);	
 	}
 }
 
@@ -241,7 +256,7 @@ void sequencerInterface(){
 			{
 				if (button[6].state)
 				{
-					steps = i+1;
+					p.steps = i+1;
 					digitalWrite(PINLED2, i>1);
 					digitalWrite(PINLED3, i>2);
 					digitalWrite(PINLED4, i>3);
@@ -251,17 +266,17 @@ void sequencerInterface(){
 				}
 				else
 				{
-					if(button[i].state) mute[i] = !mute[i];
+					if(button[i].state) p.mute[i] = !p.mute[i];
 				}
 			}
 		}
 	}
 	// set pitch
-	if( knob[0].changed ) pitch[0] = (knob[0].val >> 1) + 24;
-	if( knob[1].changed ) pitch[1] = (knob[1].val >> 1) + 24;
-	if( knob[2].changed ) pitch[2] = (knob[2].val >> 1) + 24;
-	if( knob[3].changed ) pitch[3] = (knob[3].val >> 1) + 24;	
-	if( knob[4].changed ) pitch[4] = (knob[4].val >> 1) + 24;	
+	if( knob[0].changed ) p.pitch[0] = (knob[0].val >> 1) + 24;
+	if( knob[1].changed ) p.pitch[1] = (knob[1].val >> 1) + 24;
+	if( knob[2].changed ) p.pitch[2] = (knob[2].val >> 1) + 24;
+	if( knob[3].changed ) p.pitch[3] = (knob[3].val >> 1) + 24;	
+	if( knob[4].changed ) p.pitch[4] = (knob[4].val >> 1) + 24;	
 	
 	// set bpm
 	if ( button[6].state && knob[5].changed ) // trigger on button pressed
@@ -271,7 +286,7 @@ void sequencerInterface(){
 		metro.setBPM( knob[5].val * 8 + 160 ); // 127 * 2(1 for seq 1 for leds) * 16th note(4) + 40bpm (40*4)
 	}
 	else{
-		if( knob[5].changed ) pitch[5] = (knob[5].val >> 1) + 24;
+		if( knob[5].changed ) p.pitch[5] = (knob[5].val >> 1) + 24;
 	}
 	
 	// set sequencer start/stop
@@ -296,7 +311,7 @@ void sequencerInterface(){
 		//modeLock = true;
 		for (int i = 0; i < 6; i++){
 			if (button[i].changed) {
-				stepMode = i;
+				p.stepMode = i;
 				modeLock = true; 
 			} 
 		}
@@ -312,20 +327,20 @@ void sequencer(){
 		
 		if ( seqTrigger ) // update sequencer
 		{
-			for ( int i = 0; i < steps; i++ )
+			for ( int i = 0; i < p.steps; i++ )
 			{
-				if( mute[i] )   digitalWrite(ledPinSequence[i], HIGH);
+				if( p.mute[i] )   digitalWrite(ledPinSequence[i], HIGH);
 				else digitalWrite(ledPinSequence[i], LOW);
 			}
 			//digitalWrite(PINLED1-step, LOW);
 			digitalWrite(ledPinSequence[step], LOW);
 			digitalWrite(PINLED7, LOW);
 			
-			voice[step].setPitch( pitch[step] );
+			voice[step].setPitch( p.pitch[step] );
 			
 			//if ( mute[step] )   voice[step].noteOff();
-			if ( mute[step] )   voice[step].startDCA();
-			if ( steps > 1 ) incStep();
+			if ( p.mute[step] )   voice[step].startDCA();
+			if ( p.steps > 1 ) incStep();
 			//if ( mute[step] )   voice[step].noteOn();
 		}
 		else{ // update leds running a 2x the metronome speed
@@ -348,20 +363,20 @@ void sequencer(){
 	voice[5].updateEnv();*/
 }
 void incStep(){
-	switch(stepMode){
+	switch(p.stepMode){
 		case 0: // up
 			step++;
-			if ( step > steps-1)   step = 0;
+			if ( step > p.steps-1)   step = 0;
 			break;
 		case 1: // down 
 			step--;
-			if ( step < 0)   step = steps-1;
+			if ( step < 0)   step = p.steps-1;
 			break;
 		case 2: // up&down
 			if(stepDir){ // up
 				 step++;
-				 if ( step > steps-1){
-					 step = steps-2;
+				 if ( step > p.steps-1){
+					 step = p.steps-2;
 					 stepDir = 0;
 				 }
 			}
@@ -376,8 +391,8 @@ void incStep(){
 		case 3: // palindrome 
 			if(stepDir){ // up
 				step++;
-				if ( step > steps-1){
-					step = steps-1;
+				if ( step > p.steps-1){
+					step = p.steps-1;
 					stepDir = 0;
 				}
 			}
@@ -390,11 +405,11 @@ void incStep(){
 			}
 			break;
 		case 4: // random step
-			step = rand(steps);
+			step = rand(p.steps);
 			break;
 		case 5: // random step & pitch
-			step = rand(steps);
-			pitch[step] = rand(knob[step].val >> 1) + 24;
+			step = rand(p.steps);
+			p.pitch[step] = rand(knob[step].val >> 1) + 24;
 			break;
 		default:
 		break;
