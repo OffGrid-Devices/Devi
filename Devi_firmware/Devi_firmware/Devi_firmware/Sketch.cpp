@@ -20,7 +20,7 @@ Mozzi version = master(22-04-2018)
 #pragma GCC push_options
 #pragma GCC optimize (OPTIMIZATION)
 
-#define CONTROL_RATE 512 // must be called above MozziGuts because of my code architecture....
+#define CONTROL_RATE 256 // must be called above MozziGuts because of my code architecture....
 // 512 is optimal for Ead
 // 64 is optimal for ADSR
 
