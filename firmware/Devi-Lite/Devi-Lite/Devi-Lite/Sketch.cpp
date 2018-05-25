@@ -22,6 +22,7 @@
 
 #include <MozziGuts.h> // at the top of your sketch
 #include "DeviHardware.h"
+#include "Globals.h"
 
 //Beginning of Auto generated function prototypes by Atmel Studio
 
@@ -39,21 +40,27 @@ void updateRotary();
 //End of Auto generated function prototypes by Atmel Studio
 
 
-#define CONTROL_RATE 512   // or some other power of 2
-
 void setup() {
-	startMozzi(CONTROL_RATE);
+	//startMozzi(CONTROL_RATE);
+	Serial.begin(9600);
+	DDRA = B00000000; // set all pins as inputs 
 }
 
 
-void updateControl() {
-}
+/*void updateControl() {
+	//! Update button values at CONTROL_RATE
+	buttons = PINA;
+	 
+}*/
 
-int updateAudio() {
+/*int updateAudio() {
 	return 0;
-}
+}*/
 
 void loop() {
-	audioHook();
+	//audioHook();
+	buttons = PINA;
+	Serial.println(buttons, BIN);
 }
+
 
