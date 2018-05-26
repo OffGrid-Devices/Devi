@@ -40,6 +40,7 @@ int updateAudio();
 // utilities
 void setRGB(byte r, byte g, byte b);
 void allLedsOff();
+uint8_t knob2pitch(uint8_t knobVal);
 // setups
 void ledSetup();
 void buttonSetup();
@@ -52,9 +53,17 @@ void readRotary();
 // synth functions 
 void setMode();
 void runMode(); 
-void sequencerInterface(); void sequencer(); void incStep();
+
+void sequencerInterface(); 
+void sequencer(); 
+void incStep();
+
 void trigger(); 
+
 void editor(); 
+void editA(); 
+void editB();
+
 void save(); // save variables to EEPROM 
 void load(); // load variables from EEPROM
 
@@ -86,9 +95,9 @@ void setup(){
 	buttonSetup();
 	knobSetup();
 	voiceSetup();
-	Serial.begin(9600);
+	/*Serial.begin(9600);
 	Serial.print("size of struct=");
-	Serial.println(sizeof(p));
+	Serial.println(sizeof(p));*/
 	randSeed();
 	startMozzi(CONTROL_RATE);
 	setupFastAnalogRead(FASTEST_ADC);
@@ -98,6 +107,7 @@ void updateControl(){
 	readButtons();
 	readKnobs();
 	readRotary();
+	
 	setMode();
 	runMode();
 }
@@ -273,11 +283,11 @@ void sequencerInterface(){
 		}
 	}
 	// set pitch
-	if( knob[0].changed ) p.pitch[0] = (knob[0].val >> 1) + 24;
-	if( knob[1].changed ) p.pitch[1] = (knob[1].val >> 1) + 24;
-	if( knob[2].changed ) p.pitch[2] = (knob[2].val >> 1) + 24;
-	if( knob[3].changed ) p.pitch[3] = (knob[3].val >> 1) + 24;	
-	if( knob[4].changed ) p.pitch[4] = (knob[4].val >> 1) + 24;	
+	if( knob[0].changed ) p.pitch[0] = knob2pitch(knob[0].val);
+	if( knob[1].changed ) p.pitch[1] = knob2pitch(knob[1].val);
+	if( knob[2].changed ) p.pitch[2] = knob2pitch(knob[2].val);
+	if( knob[3].changed ) p.pitch[3] = knob2pitch(knob[3].val);	
+	if( knob[4].changed ) p.pitch[4] = knob2pitch(knob[4].val);
 	
 	// set bpm
 	if ( button[6].state && knob[5].changed ) // trigger on button pressed
@@ -287,7 +297,7 @@ void sequencerInterface(){
 		metro.setBPM( knob[5].val * 8 + 160 ); // 127 * 2(1 for seq 1 for leds) * 16th note(4) + 40bpm (40*4)
 	}
 	else{
-		if( knob[5].changed ) p.pitch[5] = (knob[5].val >> 1) + 24;
+		if( knob[5].changed ) p.pitch[5] = knob2pitch(knob[5].val);
 	}
 	
 	// set sequencer start/stop
@@ -310,7 +320,7 @@ void sequencerInterface(){
 	if (button[7].state)
 	{
 		//modeLock = true;
-		for (int i = 0; i < 6; i++){
+		for (int i = 0; i < NUMVOICES; i++){
 			if (button[i].changed) {
 				p.stepMode = i;
 				modeLock = true; 
@@ -337,7 +347,7 @@ void sequencer(){
 			digitalWrite(ledPinSequence[step], LOW);
 			digitalWrite(PINLED7, LOW);
 			
-			voice[step].setPitch( p.pitch[step] );
+			voice[step].setPitch( p.pitch[step] ); // TODO: update pitch should be called on knob change
 			
 			//if ( mute[step] )   voice[step].noteOff();
 			if ( p.mute[step] )   voice[step].triggerEnv();
@@ -355,13 +365,6 @@ void sequencer(){
 	voice[3].updateEnvelope();
 	voice[4].updateEnvelope();
 	voice[5].updateEnvelope();
-	// ADSR
-	/*voice[0].updateEnv();
-	voice[1].updateEnv();
-	voice[2].updateEnv();
-	voice[3].updateEnv();
-	voice[4].updateEnv();
-	voice[5].updateEnv();*/
 }
 void incStep(){
 	switch(p.stepMode){
@@ -410,7 +413,7 @@ void incStep(){
 			break;
 		case 5: // random step & pitch
 			step = rand(p.steps);
-			p.pitch[step] = rand(knob[step].val >> 1) + 24;
+			p.pitch[step] = knob2pitch(rand(knob[step].val));
 			break;
 		default:
 		break;
@@ -427,26 +430,71 @@ void trigger(){}
 ////////////////////////////////////////////////////////////////////////
 void editor(){
 	switch(rotary){
-		case 0: // knob: set carrier pitch; knob+button: set carrier wave
-			for(int i = 0; i < NUMVOICES; i++){
-				if(button[i].state){
-					if(knob[i].changed){
-						p.wave[i] = knob[i].val >> 4; 
-						voice[i].setCarrierWave(p.wave[i]);
-					}
-				}
-				else{
-					if(knob[i].changed){
-						p.pitch[i] = knob[i].val; 
-						voice[i].setPitch(p.pitch[i]);
-					}
-				}
-					
-			}
-		break;
+		case 0: // knob: set carrier pitch; knob+button: set carrier wave; +modeLock sets ALL
+			editA();
+			break;
+		
+		case 1: 
+			editB();
+			break;
+		
+		default: 
+			modeLock = false; 
+			break;
 	}
 }
-	
+void editA(){ // edit carrier pitch and waveform 
+	if(button[7].state){ // set ALL
+		modeLock == true; // TODO: this is not working properly
+		boolean changeWave = false;
+		uint8_t w_;
+		boolean changePitch = false;
+		uint8_t p_;
+		for(int i = 0; i < NUMVOICES; i++){ // check for changes
+			if(button[i].state){
+				if(knob[i].changed){
+					w_ = knob[i].val >> 4;
+					changeWave = true;
+				}
+			}
+			else{
+				if(knob[i].changed){
+					p_ = knob2pitch(knob[i].val);
+					changePitch = true;
+				}
+			}
+		}
+		for(int i=0; i < NUMVOICES; i++){ // update ALL
+			if(changeWave){
+				p.wave[i] = w_;
+				voice[i].setCarrierWave(w_);
+			}
+			if(changePitch){
+				p.pitch[i] = p_;
+				voice[i].setPitch(p_);
+			}
+		}
+	}
+	else{ // set specific Voice
+		//modeLock = true; // TODO: this is not working properly
+		if(!button[7].changed) modeLock == false;
+		for(int i = 0; i < NUMVOICES; i++){
+			if(button[i].state){
+				if(knob[i].changed){
+					p.wave[i] = knob[i].val >> 4;
+					voice[i].setCarrierWave(p.wave[i]);
+				}
+			}
+			else{
+				if(knob[i].changed){
+					p.pitch[i] = knob2pitch(knob[i].val);
+					voice[i].setPitch(p.pitch[i]);
+				}
+			}
+		} 
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 // SAVE //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -476,7 +524,9 @@ void setRGB(byte r, byte g, byte b){
 	digitalWrite(PINBLUE, b);
 }
 
-
+uint8_t knob2pitch(uint8_t knobVal){
+	return (knobVal >> 1) + MINPITCH;
+}
 
 
 #pragma GCC pop_options
