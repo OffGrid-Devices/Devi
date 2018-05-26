@@ -25,12 +25,15 @@ Voice::~Voice()
 void Voice::init(uint8_t note, uint16_t ctrl_rate){
 	carrier.setTable(SIN2048_DATA);
 	carrier.setFreq( mtof(note) );
+	modulator.setTable(SIN2048_DATA);
+	modulator.setFreq( mtof(note) );
 	dca = new Ead(ctrl_rate);
 	att=25, dcy=450;
 }
 
 int Voice::next(){
-	return (carrier.next() * gain);
+	//return ( carrier.phMod(modulator.next()) * gain );
+	return ( carrier.next()  * gain)  ;
 }
 
 void Voice::triggerEnv(){
@@ -86,11 +89,38 @@ void Voice::setCarrierWave(uint8_t w){
 }
 
 void Voice::setModulatorPitch(uint8_t note){
-	
+	modulator.setFreq( mtof(note) );
 }
 
 void Voice::setModulatorWave(uint8_t w){
-	
+	switch(w){
+		case 0:
+			modulator.setTable(SIN2048_DATA);
+			break;
+		case 1:
+			modulator.setTable(TRIANGLE_DIST_CUBED_2048_DATA);
+			break;
+		case 2:
+			modulator.setTable(TRIANGLE_VALVE_2_2048_DATA);
+			break;
+		case 3:
+			modulator.setTable(SAW2048_DATA);
+			break;
+		case 4:
+			modulator.setTable(SQUARE_ANALOGUE512_DATA);
+			break;
+		case 5:
+			modulator.setTable(SQUARE_NO_ALIAS_2048_DATA);
+			break;
+		case 6:
+			modulator.setTable(BROWNNOISE8192_DATA);
+			break;
+		case 7:
+			modulator.setTable(PINKNOISE8192_DATA);
+			break;
+		default:
+			break;
+	}
 }
 
 // Set LFO parameters
@@ -104,10 +134,12 @@ void Voice::setLFOFreq(uint16_t f){
 
 // Set envelope parameters
 void Voice::setEnvAttack(unsigned int a){
-	
+	att = a;
+	dca->setAttack(att);
 }
 void Voice::setEnvDecay(unsigned int d){
-	
+	dcy = d;
+	dca->setDecay(dcy);
 }
 
 // Set filter parameters
@@ -128,12 +160,12 @@ void setFilterMod(int8_t m){
 void Voice::setFXType(uint8_t t){
 	
 }
-void setFXAmount(uint8_t a){
-	
+void Voice::setFXAmount(uint8_t a){
+	fxamount = a; 
 }
 
 // Set modulation parameters
-void Voice::setFilterModAmount(int8_t m){
+void Voice::setModEnvAmount(int8_t m){
 	
 }
 void Voice::setModulatorAmount(int8_t m){

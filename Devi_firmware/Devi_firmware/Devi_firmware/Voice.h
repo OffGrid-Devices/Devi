@@ -41,6 +41,7 @@ class Voice
 	Ead* dca;
 	int gain;
 	unsigned int att, dcy;
+	uint8_t fxamount; 
 	//functions
 	public:
 	Voice();
@@ -71,7 +72,7 @@ class Voice
 	void setFXType(uint8_t t);
 	void setFXAmount(uint8_t a);
 	// Set modulation parameters 
-	void setFilterModAmount(int8_t m);
+	void setModEnvAmount(int8_t m);
 	void setModulatorAmount(int8_t m);
 	 
 	

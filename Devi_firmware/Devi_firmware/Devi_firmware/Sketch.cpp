@@ -63,6 +63,12 @@ void trigger();
 void editor(); 
 void editA(); 
 void editB();
+void editC();
+void editD();
+void editE();
+void editF();
+void editG();
+void editH();
 
 void save(); // save variables to EEPROM 
 void load(); // load variables from EEPROM
@@ -435,9 +441,18 @@ void editor(){
 			break;
 		
 		case 1: 
-			editB();
+			//editB();
 			break;
-		
+		case 2:
+			//editC();
+			break;
+		case 3:
+			editD();
+		break;
+		case 4:
+			//editE();
+		break;	
+			
 		default: 
 			modeLock = false; 
 			break;
@@ -445,7 +460,7 @@ void editor(){
 }
 void editA(){ // edit carrier pitch and waveform 
 	if(button[7].state){ // set ALL
-		modeLock == true; // TODO: this is not working properly
+		//modeLock = true; // TODO: this is not working properly
 		boolean changeWave = false;
 		uint8_t w_;
 		boolean changePitch = false;
@@ -476,8 +491,7 @@ void editA(){ // edit carrier pitch and waveform
 		}
 	}
 	else{ // set specific Voice
-		//modeLock = true; // TODO: this is not working properly
-		if(!button[7].changed) modeLock == false;
+		//modeLock = false; // TODO: this is not working properly
 		for(int i = 0; i < NUMVOICES; i++){
 			if(button[i].state){
 				if(knob[i].changed){
@@ -494,7 +508,212 @@ void editA(){ // edit carrier pitch and waveform
 		} 
 	}
 }
+/*void editB(){ // edit carrier pitch and waveform
+	if(button[7].state){ // set ALL
+		modeLock = true; // TODO: this is not working properly
+		boolean changeMod = false;
+		int8_t ma_;
+		boolean changeEnvMod = false;
+		int8_t ea_;
+		for(int i = 0; i < NUMVOICES; i++){ // check for changes
+			if(button[i].state){
+				if(knob[i].changed){
+					ea_ = knob[i].val << 1;
+					changeEnvMod = true;
+				}
+			}
+			else{
+				if(knob[i].changed){
+					ea_ = knob[i].val << 1;
+					changeMod = true;
+				}
+			}
+		}
+		for(int i=0; i < NUMVOICES; i++){ // update ALL
+			if(changeEnvMod){
+				p.envamount[i] = ea_;
+				voice[i].setModEnvAmount(ea_);
+			}
+			if(changeMod){
+				p.modamount[i] = ma_;
+				voice[i].setModulatorAmount(ma_);
+			}
+		}
+	}
+	else{ // set specific Voice
+		//modeLock = true; // TODO: this is not working properly
+		if(!button[7].changed) modeLock = false;
+		for(int i = 0; i < NUMVOICES; i++){
+			if(button[i].state){
+				if(knob[i].changed){
+					p.envamount[i] = knob[i].val << 1;
+					voice[i].setModEnvAmount(p.envamount[i]);
+				}
+			}
+			else{
+				if(knob[i].changed){
+					p.modamount[i] = knob[i].val << 1;
+					voice[i].setModulatorAmount(p.modamount[i]);
+				}
+			}
+		}
+	}
+}*/
+/*void editC(){ // edit carrier pitch and waveform
+	if(button[7].state){ // set ALL
+		modeLock = true; // TODO: this is not working properly
+		boolean changeWave = false;
+		uint8_t w_;
+		boolean changePitch = false;
+		uint8_t p_;
+		for(int i = 0; i < NUMVOICES; i++){ // check for changes
+			if(button[i].state){
+				if(knob[i].changed){
+					w_ = knob[i].val >> 4;
+					changeWave = true;
+				}
+			}
+			else{
+				if(knob[i].changed){
+					p_ = knob2pitch(knob[i].val);
+					changePitch = true;
+				}
+			}
+		}
+		for(int i=0; i < NUMVOICES; i++){ // update ALL
+			if(changeWave){
+				p.modwave[i] = w_;
+				voice[i].setModulatorWave(w_);
+			}
+			if(changePitch){
+				p.modpitch[i] = p_;
+				voice[i].setModulatorPitch(p_);
+			}
+		}
+	}
+	else{ // set specific Voice
+		//modeLock = true; // TODO: this is not working properly
+		if(!button[7].changed) modeLock = false;
+		for(int i = 0; i < NUMVOICES; i++){
+			if(button[i].state){
+				if(knob[i].changed){
+					p.modwave[i] = knob[i].val >> 4;
+					voice[i].setModulatorWave(p.wave[i]);
+				}
+			}
+			else{
+				if(knob[i].changed){
+					p.modpitch[i] = knob2pitch(knob[i].val);
+					voice[i].setModulatorPitch(p.pitch[i]);
+				}
+			}
+		}
+	}
+}*/
 
+void editD(){ // edit carrier pitch and waveform
+	if(button[7].state){ // set ALL
+		//modeLock = true; // TODO: this is not working properly
+		boolean changeAtt = false;
+		uint8_t a_;
+		boolean changeDecay = false;
+		uint8_t d_;
+		for(int i = 0; i < NUMVOICES; i++){ // check for changes
+			if(button[i].state){
+				if(knob[i].changed){
+					a_ = knob[i].val <<3;
+					changeAtt = true;
+				}
+			}
+			else{
+				if(knob[i].changed){
+					d_ = knob[i].val<<3;
+					changeDecay = true;
+				}
+			}
+		}
+		for(int i=0; i < NUMVOICES; i++){ // update ALL
+			if(changeAtt){
+				p.att[i] = a_;
+				voice[i].setEnvAttack(a_);
+			}
+			if(changeDecay){
+				p.dcy[i] = d_;
+				voice[i].setEnvDecay(d_);
+			}
+		}
+	}
+	else{ // set specific Voice
+		//modeLock = true; // TODO: this is not working properly
+		if(!button[7].changed) modeLock = false;
+		for(int i = 0; i < NUMVOICES; i++){
+			if(button[i].state){
+				if(knob[i].changed){
+					p.att[i] = knob[i].val << 3;
+					voice[i].setEnvAttack(p.att[i]);
+				}
+			}
+			else{
+				if(knob[i].changed){
+					p.dcy[i] = knob[i].val<<3;
+					voice[i].setEnvDecay(p.dcy[i]);
+				}
+			}
+		}
+	}
+}
+
+/*void editE(){ // edit carrier pitch and waveform
+	if(button[7].state){ // set ALL
+		//modeLock = true; // TODO: this is not working properly
+		boolean changeFXAmt = false;
+		uint8_t a_;
+		boolean changeFX = false;
+		uint8_t fx_;
+		for(int i = 0; i < NUMVOICES; i++){ // check for changes
+			if(button[i].state){
+				if(knob[i].changed){
+					fx_ = knob[i].val >>4;
+					changeFX = true;
+				}
+			}
+			else{
+				if(knob[i].changed){
+					a_ = knob[i].val >> 2;
+					changeFXAmt = true;
+				}
+			}
+		}
+		for(int i=0; i < NUMVOICES; i++){ // update ALL
+			if(changeFXAmt){
+				p.fxamount[i] = a_;
+				voice[i].setFXAmount(a_);
+			}
+			if(changeFX){
+				p.fxtype[i] = fx_;
+				voice[i].setFXType(fx_);
+			}
+		}
+	}
+	else{ // set specific Voice
+		//modeLock = true; // TODO: this is not working properly
+		//if(!button[7].changed) modeLock = false;
+		for(int i = 0; i < NUMVOICES; i++){
+			if(button[i].state){
+				if(knob[i].changed){
+					p.fxtype[i] = knob[i].val >> 4;
+					voice[i].setFXType(p.fxtype[i]);
+				}
+			}
+			else{
+				if(knob[i].changed){
+					p.fxamount[i] = knob[i].val >> 2;
+					voice[i].setFXAmount(p.fxamount[i]);
+				}
+			}
+		}
+	}
+}*/
 //////////////////////////////////////////////////////////////////////////
 // SAVE //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
