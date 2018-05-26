@@ -55,7 +55,34 @@ void Voice::setPitch(uint8_t note){
 }
 
 void Voice::setCarrierWave(uint8_t w){
-	
+	switch(w){
+		case 0: 
+			carrier.setTable(SIN2048_DATA);
+			break; 
+		case 1:
+			carrier.setTable(TRIANGLE_DIST_CUBED_2048_DATA);
+			break;
+		case 2:
+			carrier.setTable(TRIANGLE_VALVE_2_2048_DATA);
+			break;
+		case 3:
+			carrier.setTable(SAW2048_DATA);
+			break;
+		case 4:
+			carrier.setTable(SQUARE_ANALOGUE512_DATA);
+			break;
+		case 5:
+			carrier.setTable(SQUARE_NO_ALIAS_2048_DATA);
+			break;
+		case 6:
+			carrier.setTable(BROWNNOISE8192_DATA);
+			break;
+		case 7:
+			carrier.setTable(PINKNOISE8192_DATA);
+			break;
+		default:
+			break;
+	}
 }
 
 void Voice::setModulatorPitch(uint8_t note){

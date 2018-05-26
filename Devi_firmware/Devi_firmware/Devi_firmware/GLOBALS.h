@@ -13,6 +13,10 @@
 #define OPTIMIZATION "O3"
 #pragma GCC push_options
 #pragma GCC optimize (OPTIMIZATION)
+
+// INCLUDES
+#include <Metronome.h>
+
 // MACROS
 #define bit_get(p,m) ((p) & (m))
 #define bit_set(p,m) ((p) |= (m))
@@ -24,8 +28,12 @@
 #ifndef sbi
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 #endif
-// INCLUDES
-#include <Metronome.h>
+
+// DEFINITIONS
+#define NUMVOICES 6
+#define MINPITCH 24
+#define MAXFREQ 12000 // filter maximum frequency
+
 
 
 // STORED VARIABLES (struct size = 128Bytes x 12 presets = 1536Bytes) ArduinoMega EEPROM = 4096Bytes
@@ -42,10 +50,10 @@ uint8_t stepMode = 0; // up, down, up&down, palindrome, random step, random step
 ////////////////////////////////////////////////////////////////////////
 // Carrier oscillator
 uint8_t pitch[6] = {36, 39, 43, 46, 48, 29}; // carrier pitch
-uint8_t wave[6]; // carrier waveform: 0-sin, 1-tri, 2-rampup, 3-rampdown, 4-square, 5-noise
+uint8_t wave[8]; // carrier waveform: 0-sin, 1-tri, 2-rampup, 3-rampdown, 4-square, 5-noise
 // Modulator oscillator
 uint8_t modpitch[6] = {36, 39, 43, 46, 48, 29}; // modulator pitch	
-uint8_t modwave[6]; // carrier waveform: 0-sin, 1-tri, 2-rampup, 3-rampdown, 4-square, 5-noise
+uint8_t modwave[8]; // carrier waveform: 0-sin, 1-tri, 2-rampup, 3-rampdown, 4-square, 5-noise
 // Modulation parameters
 int8_t modamount[6]; // modulation amount
 int8_t envamount[6]; // envelope to modulation amount 
@@ -62,7 +70,7 @@ uint8_t filterres[6] = {127, 127, 127, 127, 127, 127}; // filter resonance
 int8_t filtermod[6]; // LFO to filter modulation amount	
 // LFO
 uint16_t lfofreq[6] = {4, 4, 4, 4, 4, 4}; // lfo frequency
-uint8_t lfowave[6]; // lfo waveform: 0-sin, 1-tri, 2-rampup, 3-rampdown, 4-square, 5-noise 
+uint8_t lfowave[8]; // lfo waveform: 0-sin, 1-tri, 2-rampup, 3-rampdown, 4-square, 5-noise 
 };
 
 

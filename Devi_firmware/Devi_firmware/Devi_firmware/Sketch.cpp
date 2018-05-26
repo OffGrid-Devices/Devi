@@ -71,7 +71,7 @@ Button button[8];
 boolean selectLock = false, modeLock = false;
 Potentiometer knob[8];
 // SYNTH CLASSES
-Voice voice[6];
+Voice voice[NUMVOICES];
 // PRESET STRUCT
 Preset p;
 
@@ -86,9 +86,9 @@ void setup(){
 	buttonSetup();
 	knobSetup();
 	voiceSetup();
-	/*Serial.begin(9600);
+	Serial.begin(9600);
 	Serial.print("size of struct=");
-	Serial.println(sizeof(p));*/
+	Serial.println(sizeof(p));
 	randSeed();
 	startMozzi(CONTROL_RATE);
 	setupFastAnalogRead(FASTEST_ADC);
@@ -153,7 +153,7 @@ void knobSetup(){
 	knob[5].init(A5);
 }
 void voiceSetup(){
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < NUMVOICES; i++)
 	{
 		voice[i].init(p.pitch[i], CONTROL_RATE);	
 	}
@@ -234,7 +234,7 @@ void runMode(){
 			break;
 		case 2: // editor (white)
 			sequencer();
-			//metro.stop();
+			editor();
 			break;
 		case 3: // save (red)
 			sequencer();
@@ -252,7 +252,7 @@ void runMode(){
 void sequencerInterface(){
 	// set mutes and step length 
 	if(!button[7].state){
-		for(int i = 0; i < 6; i++){
+		for(int i = 0; i < NUMVOICES; i++){
 			if (button[i].changed)
 			{
 				if (button[6].state)
@@ -425,7 +425,27 @@ void trigger(){}
 //////////////////////////////////////////////////////////////////////////
 // EDITOR ///////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
-void editor(){}
+void editor(){
+	switch(rotary){
+		case 0: // knob: set carrier pitch; knob+button: set carrier wave
+			for(int i = 0; i < NUMVOICES; i++){
+				if(button[i].state){
+					if(knob[i].changed){
+						p.wave[i] = knob[i].val >> 4; 
+						voice[i].setCarrierWave(p.wave[i]);
+					}
+				}
+				else{
+					if(knob[i].changed){
+						p.pitch[i] = knob[i].val; 
+						voice[i].setPitch(p.pitch[i]);
+					}
+				}
+					
+			}
+		break;
+	}
+}
 	
 //////////////////////////////////////////////////////////////////////////
 // SAVE //////////////////////////////////////////////////////////////////
