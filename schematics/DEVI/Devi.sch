@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -7800,6 +7800,9 @@ Din5=XLR3</text>
 <text x="103.378" y="131.572" size="1.778" layer="94">(PORT K &amp; L)</text>
 <text x="272.288" y="145.288" size="1.778" layer="94">*</text>
 <text x="282.702" y="141.732" size="1.778" layer="94">* - This should be used for an analog low pass filter</text>
+<text x="38.1" y="129.54" size="1.778" layer="91">RED - 1k
+GREEN - 4k7 
+BLUE - 680 Ohm</text>
 </plain>
 <instances>
 <instance part="FRAME1" gate="G$1" x="4.064" y="3.81"/>
