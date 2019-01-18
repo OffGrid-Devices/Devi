@@ -16,7 +16,6 @@
 #include <Oscil.h>
 #include <Ead.h>
 #include <mozzi_midi.h>
-#include <StateVariable.h>
 // wavetables 
 #include "tables/sin2048_int8.h"
 #include "tables/triangle_dist_cubed_2048_int8.h"

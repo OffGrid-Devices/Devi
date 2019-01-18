@@ -30,7 +30,7 @@
 #endif
 
 // DEFINITIONS
-#define NUMVOICES 6
+#define NUMVOICES 4
 #define MINPITCH 24
 #define MAXFREQ 12000 // filter maximum frequency
 

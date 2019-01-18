@@ -20,7 +20,6 @@ Mozzi version = master(22-04-2018)
 #pragma GCC push_options
 #pragma GCC optimize (OPTIMIZATION)
 
-#define CONTROL_RATE 64 // must be called above MozziGuts because of my code architecture....
 // 512 is optimal for Ead
 // 64 is optimal for ADSR
 // 256 is a nice value
@@ -30,9 +29,14 @@ MIDI_CREATE_DEFAULT_INSTANCE();
 #include <MozziGuts.h>
 #include <mozzi_rand.h>
 #include <mozzi_fixmath.h>
+#include <mozzi_midi.h>
 #include <ADSR.h>
 #include "GLOBALS.h"
-#include "Voice.h"
+//#include "Voice.h"
+#include <Oscil.h>
+#include "tables/sin2048_int8.h"
+
+
 
 //Beginning of Auto generated function prototypes by Atmel Studio
 void updateControl();
@@ -48,8 +52,12 @@ void readRotary();
 //////////////////////////////////////////////////////////////////////////
 // CLASSES //////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
-Voice voice;
-ADSR <CONTROL_RATE, AUDIO_RATE> envelope;
+//Voice voice;
+Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> osc[NUMVOICES];
+ADSR <CONTROL_RATE, AUDIO_RATE> env[NUMVOICES];
+uint8_t voice[NUMVOICES];
+
+//uint8_t note1, note2, note3, note4;
 uint16_t attack = 100, decay = 100, release = 3000;  
 uint8_t sustain	= 255; // (aka decay level)
 uint8_t atklevel = 255;
@@ -58,40 +66,64 @@ uint16_t sustime = 65535;
 // MAIN FUNCTIONS ///////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 void HandleNoteOn(byte channel, byte note, byte velocity){
-	envelope.noteOn();
+	  //digitalWrite(PINLED7, HIGH);
+	  for (unsigned int i = 0; i < NUMVOICES; i++){
+		  if(voice[i]==0){
+			voice[i] = note;
+			osc[i].setFreq(mtof(note));
+			env[i].noteOn();
+			break;
+		  }
+	  }
 }
 void HandleNoteOff(byte channel, byte note, byte velocity){
-	envelope.noteOff();
+	//digitalWrite(PINLED7, LOW);
+	for (unsigned int i = 0; i < NUMVOICES; i++){
+		if(voice[i]==note){
+			voice[i] = 0;
+			env[i].noteOff();
+			break;
+		}
+	}
 }
 
 void setup(){
+	pinMode(PINLED7, OUTPUT);
+	
 	MIDI.setHandleNoteOn(HandleNoteOn); 
 	MIDI.setHandleNoteOff(HandleNoteOff);
-	MIDI.begin(MIDI_CHANNEL_OMNI);  
+	MIDI.begin(MIDI_CHANNEL_OMNI);	
 	
-	voice.init(60, CONTROL_RATE);
-	envelope.setADLevels(255, sustain);
-	envelope.setTimes(attack, decay, sustime, release);
-	//envelope.setADLevels(255,64);
-	//envelope.setTimes(50,200,10000,200); // 10000 is so the note will sustain 10 seconds unless a noteOff comes
-
+	//voice.init(60, CONTROL_RATE);	
+	
 	startMozzi(CONTROL_RATE);
 	setupFastAnalogRead(FASTEST_ADC);
+	
+	for(uint8_t i = 0; i < NUMVOICES; i++){
+		osc[i].setTable(SIN2048_DATA);
+		env[i].setADLevels(255, sustain);
+		env[i].setTimes(attack, decay, sustime, release);
+	}
 }
 
 void updateControl(){
 	MIDI.read();
 	
 	readRotary();
-	envelope.update();
-	voice.setFreq(1, mozziAnalogRead(A0) + 30);
-	voice.setFreq(2, mozziAnalogRead(A1) + 30);
-	voice.setFreq(3, mozziAnalogRead(A2) + 30);
-	voice.setFreq(4, mozziAnalogRead(A3) + 30);
+	
+	for(uint8_t i = 0; i < NUMVOICES; i++){
+		env[i].update();
+	}
+
 }
 
 int updateAudio(){ 
-	return  (voice.next(rotary) * envelope.next())>>2;
+	int sig = 0; 
+	for (int i = 0; i < NUMVOICES; i++)
+	{
+		sig += ((int)osc[i].next() * env[i].next())>>4;
+	}
+	return sig; 
 	// 14-bit output: -8192 to 8191
 }
 
