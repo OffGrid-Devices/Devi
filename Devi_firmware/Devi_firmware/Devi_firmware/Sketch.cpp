@@ -92,7 +92,6 @@ void updateControl(){
 
 int updateAudio(){ 
 	return  (voice.next(rotary) * envelope.next())>>2;
-	//return voice.next(rotary);
 	// 14-bit output: -8192 to 8191
 }
 

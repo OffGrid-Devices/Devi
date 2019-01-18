@@ -50,7 +50,7 @@ int8_t Voice::next(uint8_t algo){
 				  + osc2.next()
 				  + osc3.next()
 				  + osc4.next()
-				) << 3;
+				)>>2;
 		break;
 		
 		case 1:
@@ -61,7 +61,7 @@ int8_t Voice::next(uint8_t algo){
 			sig = ( osc1.next()
 				  + osc2.next()
 				  + osc3.phMod(mod3)
-			)<<3;
+			)>>2;
 		break;
 		
 		/*	  [4]
@@ -72,7 +72,7 @@ int8_t Voice::next(uint8_t algo){
 			sig = ( osc1.next()
 				  + osc2.phMod(mod3)
 				  + osc3.phMod(mod3)
-				)<<3;
+				)>>2;
 		break;	
 		case 3:
 		/* [4]
@@ -82,7 +82,7 @@ int8_t Voice::next(uint8_t algo){
 			sig = ( osc1.phMod(mod3)
 				  + osc2.phMod(mod3)
 				  + osc3.phMod(mod3)
-				)<<3;
+				)>>2;
 		break;
 		
 		case 4: 
@@ -94,7 +94,7 @@ int8_t Voice::next(uint8_t algo){
 		mod2 = osc3.phMod(osc4.next() * depth) * depth; 
 		sig = ( osc1.next() 
 			  + osc2.phMod(mod2)
-			) << 4; 
+			)>>1; 
 		break;
 		
 		case 5:
@@ -105,7 +105,7 @@ int8_t Voice::next(uint8_t algo){
 			mod3 = osc4.next() * depth;
 			sig = ( osc1.phMod(mod1)
 				  + osc3.phMod(mod3)
-				)<<4;
+				)>>1;
 		break;
 		
 		case 6:
@@ -116,7 +116,7 @@ int8_t Voice::next(uint8_t algo){
 			mod3 = osc4.next() * depth;
 			sig = ( osc1.phMod(mod1)
 				+ osc3.phMod(mod3)
-				)<<4;
+				)>>1;
 		break;
 		
 		case 7:
@@ -127,7 +127,7 @@ int8_t Voice::next(uint8_t algo){
 			mod3 = ( (osc2.next()+osc4.next())>>1 )*depth;
 			sig = ( osc1.phMod(mod1)
 				  + osc3.phMod(mod3)
-				)<<4;
+				)>>1;
 		break;
 		
 		case 8:
@@ -139,7 +139,7 @@ int8_t Voice::next(uint8_t algo){
 			mod1 = osc3.phMod( osc4.next()*depth )*depth;
 			sig = ( osc1.phMod(mod1)
 				  + osc2.phMod(mod1)
-				)<<4;
+				)>>1;
 		break;
 		
 		case 9:
@@ -150,7 +150,7 @@ int8_t Voice::next(uint8_t algo){
 			[1]		*/
 			mod2 = osc4.next() * depth; 
 			mod1 = ( ( osc2.phMod(mod2) + osc3.phMod(mod2) )>>1 )*depth;  
-			sig = ( osc1.phMod(mod1) )<<5;
+			sig = osc1.phMod(mod1);
 		break;
 		
 		case 10:
@@ -159,7 +159,7 @@ int8_t Voice::next(uint8_t algo){
 			   [1]		*/
 			mod1 = ( ( osc2.next()+osc3.next()+osc4.next() )>>2 )*depth; 
 			// note: dividing by 3.f will cause some glitches, so I used >>2 that goes from 0 to 191
-			sig = ( osc1.phMod(mod1) )<<5;
+			sig = osc1.phMod(mod1);
 		break;
 		
 		case 11:
@@ -173,11 +173,11 @@ int8_t Voice::next(uint8_t algo){
 			mod3 = osc4.next() * depth;
 			mod2 = osc3.phMod(mod3) * depth;
 			mod1 = osc2.phMod(mod2) *depth;
-			sig = ( osc1.phMod(mod1) )<<5;
+			sig = osc1.phMod(mod1);
 		break;
 		
 	}
-	return sig >> 6;
+	return sig;
 	// 8-bit output: -256 to 255
 }
 
