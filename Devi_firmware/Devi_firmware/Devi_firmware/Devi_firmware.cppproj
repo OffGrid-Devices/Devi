@@ -95,6 +95,9 @@
       <Value>..\include\libraries\Mozzi\tables</Value>
       <Value>..\include\libraries\Mozzi\utility</Value>
       <Value>..\include\libraries\EEPROM</Value>
+      <Value>..\include\libraries\MIDI\examples\RPN_NRPN</Value>
+      <Value>..\include\libraries\MIDI\examples\SimpleSynth</Value>
+      <Value>..\include\libraries\MIDI\src</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
@@ -147,6 +150,9 @@
       <Value>..\include\libraries\Mozzi\tables</Value>
       <Value>..\include\libraries\Mozzi\utility</Value>
       <Value>..\include\libraries\EEPROM</Value>
+      <Value>..\include\libraries\MIDI\examples\RPN_NRPN</Value>
+      <Value>..\include\libraries\MIDI\examples\SimpleSynth</Value>
+      <Value>..\include\libraries\MIDI\src</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
@@ -224,6 +230,9 @@
       <Value>..\include\libraries\Mozzi\tables</Value>
       <Value>..\include\libraries\Mozzi\utility</Value>
       <Value>..\include\libraries\EEPROM</Value>
+      <Value>..\include\libraries\MIDI\examples\RPN_NRPN</Value>
+      <Value>..\include\libraries\MIDI\examples\SimpleSynth</Value>
+      <Value>..\include\libraries\MIDI\src</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
@@ -276,6 +285,9 @@
       <Value>..\include\libraries\Mozzi\tables</Value>
       <Value>..\include\libraries\Mozzi\utility</Value>
       <Value>..\include\libraries\EEPROM</Value>
+      <Value>..\include\libraries\MIDI\examples\RPN_NRPN</Value>
+      <Value>..\include\libraries\MIDI\examples\SimpleSynth</Value>
+      <Value>..\include\libraries\MIDI\src</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
@@ -315,6 +327,48 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\libraries\EEPROM\EEPROM.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\libraries\MIDI\examples\RPN_NRPN\utility.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\libraries\MIDI\examples\SimpleSynth\noteList.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\libraries\MIDI\examples\SimpleSynth\pitches.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\libraries\MIDI\src\MIDI.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\libraries\MIDI\src\MIDI.hpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\libraries\MIDI\src\midi_Defs.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\libraries\MIDI\src\midi_Message.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\libraries\MIDI\src\midi_Namespace.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\libraries\MIDI\src\midi_RingBuffer.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\libraries\MIDI\src\midi_RingBuffer.hpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\libraries\MIDI\src\midi_Settings.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\libraries\MIDI\src\midi_UsbDefs.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\libraries\MIDI\src\midi_UsbTransport.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\libraries\MIDI\src\midi_UsbTransport.hpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\libraries\Mozzi\ADSR.h">
@@ -779,6 +833,12 @@
     <Compile Include="Sketch.cpp">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\libraries\MIDI\examples\SimpleSynth\noteList.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\libraries\MIDI\src\MIDI.cpp">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\libraries\Mozzi\MozziGuts.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -829,6 +889,11 @@
     <Folder Include="include\" />
     <Folder Include="include\libraries\" />
     <Folder Include="include\libraries\EEPROM\" />
+    <Folder Include="include\libraries\MIDI\" />
+    <Folder Include="include\libraries\MIDI\examples\" />
+    <Folder Include="include\libraries\MIDI\examples\RPN_NRPN\" />
+    <Folder Include="include\libraries\MIDI\examples\SimpleSynth\" />
+    <Folder Include="include\libraries\MIDI\src\" />
     <Folder Include="include\libraries\Mozzi\" />
     <Folder Include="include\libraries\Mozzi\config\" />
     <Folder Include="include\libraries\Mozzi\examples\" />
@@ -848,6 +913,10 @@
     <Folder Include="include\libraries\Mozzi\utility\" />
     <Folder Include="src\" />
     <Folder Include="src\libraries\" />
+    <Folder Include="src\libraries\MIDI\" />
+    <Folder Include="src\libraries\MIDI\examples\" />
+    <Folder Include="src\libraries\MIDI\examples\SimpleSynth\" />
+    <Folder Include="src\libraries\MIDI\src\" />
     <Folder Include="src\libraries\Mozzi\" />
     <Folder Include="src\libraries\Mozzi\extras\" />
     <Folder Include="src\libraries\Mozzi\extras\doc\" />

@@ -34,52 +34,42 @@ class Voice
 	public:
 	protected:
 	private:
-	Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> carrier;
-	Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> modulator;
-	Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> lfo;
-	StateVariable <BANDPASS> svf; // can be LOWPASS, BANDPASS, HIGHPASS or NOTCH
-	Ead* dca;
-	int gain;
-	unsigned int att, dcy;
-	uint8_t fxamount; 
+		Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> osc1;
+		Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> osc2;
+		Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> osc3;
+		Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> osc4;
+		
+		Ead* dca;
+		int gain;
+		unsigned int att, dcy;
+		
+		Q15n16 mod1, mod2, mod3;
+		uint8_t depth = 255;
+		
+		float freq[4];
+
 	//functions
 	public:
-	Voice();
-	~Voice();
-	void init(uint8_t note, uint16_t ctrl_rate);
-	int next();
-	void triggerEnv(); // trigger envelope
-	void updateEnvelope(); // update envelope
-	void updateLFO(); // update LFO
+		Voice();
+		~Voice();
+		
+		void init(uint8_t note, uint16_t ctrl_rate);
+		int8_t next(uint8_t algo);
+		void triggerEnv(); // trigger envelope
+		void updateEnvelope(); // update envelope
 	
-	// Set oscillator parameters 
-	void setPitch(uint8_t note); // set carrier note->frequency
-	void setCarrierWave(uint8_t w);
-	void setModulatorPitch(uint8_t note);
-	void setModulatorWave(uint8_t w); 
-	// Set LFO parameters
-	void setLFOWave(uint8_t);
-	void setLFOFreq(uint16_t f);
-	// Set envelope parameters
-	void setEnvAttack(unsigned int a); // set envelope attack 
-	void setEnvDecay(unsigned int d); // set envelope decay 
-	// Set filter parameters
-	void setFilterType(uint8_t t);
-	void setFilterFreq(uint16_t f);
-	void setFilterRes(uint8_t r);
-	void setFilterMod(int8_t m);
-	// Set fx parameters 
-	void setFXType(uint8_t t);
-	void setFXAmount(uint8_t a);
-	// Set modulation parameters 
-	void setModEnvAmount(int8_t m);
-	void setModulatorAmount(int8_t m);
-	 
+		// Set oscillator parameters 
+		//void setPitch(uint8_t note); // set carrier note->frequency
+		void setFreq(uint8_t i, float f);
+		
+		// Set envelope parameters
+		void setEnvAttack(unsigned int a); // set envelope attack 
+		void setEnvDecay(unsigned int d); // set envelope decay 
 	
 	protected:
 	private:
-	Voice( const Voice &c );
-	Voice& operator=( const Voice &c );
+		Voice( const Voice &c );
+		Voice& operator=( const Voice &c );
 
 }; //Voice
 

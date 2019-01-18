@@ -5,7 +5,6 @@
 * Author: tiago
 */
 
-
 #include "Voice.h"
 
 #pragma GCC push_options
@@ -23,17 +22,163 @@ Voice::~Voice()
 } //~Voice
 
 void Voice::init(uint8_t note, uint16_t ctrl_rate){
-	carrier.setTable(SIN2048_DATA);
-	carrier.setFreq( mtof(note) );
-	modulator.setTable(SIN2048_DATA);
-	modulator.setFreq( mtof(note) );
+	osc1.setTable(SIN2048_DATA);
+	osc2.setTable(SIN2048_DATA);
+	osc3.setTable(SIN2048_DATA);
+	osc4.setTable(SIN2048_DATA);
+	
+	freq[0] = 440;
+	freq[1] = 220;
+	freq[2] = 110;
+	freq[3] = 55;
+
+	osc1.setFreq( freq[0] );
+	osc2.setFreq( freq[1] );
+	osc3.setFreq( freq[2] );
+	osc4.setFreq( freq[3] );
+	
 	dca = new Ead(ctrl_rate);
 	att=25, dcy=450;
 }
 
-int Voice::next(){
-	//return ( carrier.phMod(modulator.next()) * gain );
-	return ( carrier.next()  * gain)  ;
+int8_t Voice::next(uint8_t algo){
+	int sig;
+	switch(algo){ 
+		case 0: 
+		/*	[1] [2] [3] [4]	*/
+			sig = ( osc1.next() 
+				  + osc2.next()
+				  + osc3.next()
+				  + osc4.next()
+				) << 3;
+		break;
+		
+		case 1:
+		/*	  [4]
+			   |		
+		[1][2][3]	*/	
+			mod3 = osc4.next() * depth;
+			sig = ( osc1.next()
+				  + osc2.next()
+				  + osc3.phMod(mod3)
+			)<<3;
+		break;
+		
+		/*	  [4]
+			 / |
+		[1][2][3]	*/
+		case 2:
+			mod3 = osc4.next() * depth;
+			sig = ( osc1.next()
+				  + osc2.phMod(mod3)
+				  + osc3.phMod(mod3)
+				)<<3;
+		break;	
+		case 3:
+		/* [4]
+		 /  |  \
+		[1][2][3]	*/
+			mod3 = osc4.next() * depth;
+			sig = ( osc1.phMod(mod3)
+				  + osc2.phMod(mod3)
+				  + osc3.phMod(mod3)
+				)<<3;
+		break;
+		
+		case 4: 
+		/* [4]
+			|
+		   [3]
+			|
+		[1][2] */
+		mod2 = osc3.phMod(osc4.next() * depth) * depth; 
+		sig = ( osc1.next() 
+			  + osc2.phMod(mod2)
+			) << 4; 
+		break;
+		
+		case 5:
+		/* [2][4]
+			|  |
+		   [1][3]	*/
+			mod1 = osc2.next() * depth;
+			mod3 = osc4.next() * depth;
+			sig = ( osc1.phMod(mod1)
+				  + osc3.phMod(mod3)
+				)<<4;
+		break;
+		
+		case 6:
+		/* [2][4]
+		    | /|
+	       [1][3] */
+			mod1 = ( (osc2.next() + osc4.next())>>1 )*depth;
+			mod3 = osc4.next() * depth;
+			sig = ( osc1.phMod(mod1)
+				+ osc3.phMod(mod3)
+				)<<4;
+		break;
+		
+		case 7:
+		/* [2][4]
+		    | \|
+		   [1][3]	*/
+			mod1 = osc2.next() * depth;
+			mod3 = ( (osc2.next()+osc4.next())>>1 )*depth;
+			sig = ( osc1.phMod(mod1)
+				  + osc3.phMod(mod3)
+				)<<4;
+		break;
+		
+		case 8:
+		/*  [4]
+			 |
+			[3]
+			/  \
+		   [1][2]	*/
+			mod1 = osc3.phMod( osc4.next()*depth )*depth;
+			sig = ( osc1.phMod(mod1)
+				  + osc2.phMod(mod1)
+				)<<4;
+		break;
+		
+		case 9:
+		/*  [4]
+		   /   \
+		  [2] [3]
+		   \   /
+			[1]		*/
+			mod2 = osc4.next() * depth; 
+			mod1 = ( ( osc2.phMod(mod2) + osc3.phMod(mod2) )>>1 )*depth;  
+			sig = ( osc1.phMod(mod1) )<<5;
+		break;
+		
+		case 10:
+		/*  [2][3][4]
+		     \  |  /
+			   [1]		*/
+			mod1 = ( ( osc2.next()+osc3.next()+osc4.next() )>>2 )*depth; 
+			// note: dividing by 3.f will cause some glitches, so I used >>2 that goes from 0 to 191
+			sig = ( osc1.phMod(mod1) )<<5;
+		break;
+		
+		case 11:
+		/* [4]
+		    |
+		   [3]
+		    | 
+		   [2]
+		    |
+		   [1]		*/
+			mod3 = osc4.next() * depth;
+			mod2 = osc3.phMod(mod3) * depth;
+			mod1 = osc2.phMod(mod2) *depth;
+			sig = ( osc1.phMod(mod1) )<<5;
+		break;
+		
+	}
+	return sig >> 6;
+	// 8-bit output: -256 to 255
 }
 
 void Voice::triggerEnv(){
@@ -44,16 +189,24 @@ void Voice::updateEnvelope(){
 	gain = dca->next();
 }
 
-void Voice::updateLFO(){
 
-}
 
 
 //////////////////////////////////////////////////////////////////////////
 
 
 // Set oscillator parameters
-void Voice::setPitch(uint8_t note){
+void Voice::setFreq(uint8_t i, float f){
+	switch(i){
+		case 1:	osc1.setFreq(f); break;
+		case 2:	osc2.setFreq(f); break;
+		case 3:	osc3.setFreq(f); break;
+		case 4:	osc4.setFreq(f); break;
+		default: break;
+	}
+}
+
+/*void Voice::setPitch(uint8_t note){
 	carrier.setFreq( mtof(note) );
 }
 
@@ -121,16 +274,7 @@ void Voice::setModulatorWave(uint8_t w){
 		default:
 			break;
 	}
-}
-
-// Set LFO parameters
-void Voice::setLFOWave(uint8_t){
-	
-}
-
-void Voice::setLFOFreq(uint16_t f){
-	
-}
+}*/
 
 // Set envelope parameters
 void Voice::setEnvAttack(unsigned int a){
@@ -141,36 +285,5 @@ void Voice::setEnvDecay(unsigned int d){
 	dcy = d;
 	dca->setDecay(dcy);
 }
-
-// Set filter parameters
-void Voice::setFilterType(uint8_t t){
-	
-}
-void Voice::setFilterFreq(uint16_t f){
-	
-}
-void Voice::setFilterRes(uint8_t r){
-	
-}
-void setFilterMod(int8_t m){
-	
-}
-
-// Set fx parameters
-void Voice::setFXType(uint8_t t){
-	
-}
-void Voice::setFXAmount(uint8_t a){
-	fxamount = a; 
-}
-
-// Set modulation parameters
-void Voice::setModEnvAmount(int8_t m){
-	
-}
-void Voice::setModulatorAmount(int8_t m){
-	
-}
-
 
 #pragma GCC pop_options

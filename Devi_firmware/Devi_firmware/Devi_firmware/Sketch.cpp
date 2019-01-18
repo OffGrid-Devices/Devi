@@ -24,20 +24,21 @@ Mozzi version = master(22-04-2018)
 // 512 is optimal for Ead
 // 64 is optimal for ADSR
 // 256 is a nice value
-
+#include <EEPROM.h>
+#include <MIDI.h>
+MIDI_CREATE_DEFAULT_INSTANCE();
 #include <MozziGuts.h>
 #include <mozzi_rand.h>
 #include <mozzi_fixmath.h>
-#include <EEPROM.h>
-
+#include <ADSR.h>
 #include "GLOBALS.h"
-
-#include "tables/cos2048_int8.h" // table for Oscils to play
-#include <Oscil.h>
+#include "Voice.h"
 
 //Beginning of Auto generated function prototypes by Atmel Studio
 void updateControl();
 int updateAudio();
+void HandleNoteOn(byte channel, byte note, byte velocity);
+void HandleNoteOff(byte channel, byte note, byte velocity);
 
 void readRotary();
 //End of Auto generated function prototypes by Atmel Studio
@@ -47,174 +48,51 @@ void readRotary();
 //////////////////////////////////////////////////////////////////////////
 // CLASSES //////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
-Oscil<COS2048_NUM_CELLS, AUDIO_RATE> osc1(COS2048_DATA);
-Oscil<COS2048_NUM_CELLS, AUDIO_RATE> osc2(COS2048_DATA);
-Oscil<COS2048_NUM_CELLS, AUDIO_RATE> osc3(COS2048_DATA);
-Oscil<COS2048_NUM_CELLS, AUDIO_RATE> osc4(COS2048_DATA);
-
-Q15n16 mod1, mod2, mod3;
-uint8_t depth = 255; 
+Voice voice;
+ADSR <CONTROL_RATE, AUDIO_RATE> envelope;
+uint16_t attack = 100, decay = 100, release = 3000;  
+uint8_t sustain	= 255; // (aka decay level)
+uint8_t atklevel = 255;
+uint16_t sustime = 65535;
 //////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS ///////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
+void HandleNoteOn(byte channel, byte note, byte velocity){
+	envelope.noteOn();
+}
+void HandleNoteOff(byte channel, byte note, byte velocity){
+	envelope.noteOff();
+}
 
 void setup(){
-	osc1.setFreq(440);
-	osc2.setFreq(220);
-	osc3.setFreq(110);
-	osc4.setFreq(55);
+	MIDI.setHandleNoteOn(HandleNoteOn); 
+	MIDI.setHandleNoteOff(HandleNoteOff);
+	MIDI.begin(MIDI_CHANNEL_OMNI);  
 	
+	voice.init(60, CONTROL_RATE);
+	envelope.setADLevels(255, sustain);
+	envelope.setTimes(attack, decay, sustime, release);
+	//envelope.setADLevels(255,64);
+	//envelope.setTimes(50,200,10000,200); // 10000 is so the note will sustain 10 seconds unless a noteOff comes
+
 	startMozzi(CONTROL_RATE);
 	setupFastAnalogRead(FASTEST_ADC);
 }
 
 void updateControl(){
-	readRotary();
-
+	MIDI.read();
 	
-	osc1.setFreq(mozziAnalogRead(A0) + 30);
-	osc2.setFreq(mozziAnalogRead(A1) + 30);
-	osc3.setFreq(mozziAnalogRead(A2) + 30);
-	osc4.setFreq(mozziAnalogRead(A3) + 30);
+	readRotary();
+	envelope.update();
+	voice.setFreq(1, mozziAnalogRead(A0) + 30);
+	voice.setFreq(2, mozziAnalogRead(A1) + 30);
+	voice.setFreq(3, mozziAnalogRead(A2) + 30);
+	voice.setFreq(4, mozziAnalogRead(A3) + 30);
 }
 
 int updateAudio(){ 
-	int sig;
-	switch(rotary){ // CHECK IF CODE IS CORRECT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		case 0: 
-		/*	[1] [2] [3] [4]	*/
-			sig = ( osc1.next() 
-				  + osc2.next()
-				  + osc3.next()
-				  + osc4.next()
-				) << 3;
-		break;
-		
-		case 1:
-		/*	  [4]
-			   |		
-		[1][2][3]	*/	
-			mod3 = osc4.next() * depth;
-			sig = ( osc1.next()
-				  + osc2.next()
-				  + osc3.phMod(mod3)
-			)<<3;
-		break;
-		
-		/*	  [4]
-			 / |
-		[1][2][3]	*/
-		case 2:
-			mod3 = osc4.next() * depth;
-			sig = ( osc1.next()
-				  + osc2.phMod(mod3)
-				  + osc3.phMod(mod3)
-				)<<3;
-		break;	
-		case 3:
-		/* [4]
-		 /  |  \
-		[1][2][3]	*/
-			mod3 = osc4.next() * depth;
-			sig = ( osc1.phMod(mod3)
-				  + osc2.phMod(mod3)
-				  + osc3.phMod(mod3)
-				)<<3;
-		break;
-		
-		case 4: 
-		/* [4]
-			|
-		   [3]
-			|
-		[1][2] */
-		mod2 = osc3.phMod(osc4.next() * depth) * depth; 
-		sig = ( osc1.next() 
-			  + osc2.phMod(mod2)
-			) << 4; 
-		break;
-		
-		case 5:
-		/* [2][4]
-			|  |
-		   [1][3]	*/
-			mod1 = osc2.next() * depth;
-			mod3 = osc4.next() * depth;
-			sig = ( osc1.phMod(mod1)
-				  + osc3.phMod(mod3)
-				)<<4;
-		break;
-		
-		case 6:
-		/* [2][4]
-		    | /|
-	       [1][3] */
-			mod1 = ( (osc2.next() + osc4.next())>>1 )*depth;
-			mod3 = osc4.next() * depth;
-			sig = ( osc1.phMod(mod1)
-				+ osc3.phMod(mod3)
-				)<<4;
-		break;
-		
-		case 7:
-		/* [2][4]
-		    | \|
-		   [1][3]	*/
-			mod1 = osc2.next() * depth;
-			mod3 = ( (osc2.next()+osc4.next())>>1 )*depth;
-			sig = ( osc1.phMod(mod1)
-				  + osc3.phMod(mod3)
-				)<<4;
-		break;
-		
-		case 8:
-		/*  [4]
-			 |
-			[3]
-			/  \
-		   [1][2]	*/
-			mod1 = osc3.phMod( osc4.next()*depth )*depth;
-			sig = ( osc1.phMod(mod1)
-				  + osc2.phMod(mod1)
-				)<<4;
-		break;
-		
-		case 9:
-		/*  [4]
-		   /   \
-		  [2] [3]
-		   \   /
-			[1]		*/
-			mod2 = osc4.next() * depth; 
-			mod1 = ( ( osc2.phMod(mod2) + osc3.phMod(mod2) )>>1 )*depth;  
-			sig = ( osc1.phMod(mod1) )<<5;
-		break;
-		
-		case 10:
-		/*  [2][3][4]
-		     \  |  /
-			   [1]		*/
-			mod1 = ( ( osc2.next()+osc3.next()+osc4.next() )>>2 )*depth; 
-			// note: dividing by 3.f will cause some glitches, so I used >>2 that goes from 0 to 191
-			sig = ( osc1.phMod(mod1) )<<5;
-		break;
-		
-		case 11:
-		/* [4]
-		    |
-		   [3]
-		    | 
-		   [2]
-		    |
-		   [1]		*/
-			mod3 = osc4.next() * depth;
-			mod2 = osc3.phMod(mod3) * depth;
-			mod1 = osc2.phMod(mod2) *depth;
-			sig = ( osc1.phMod(mod1) )<<5;
-		break;
-		
-	}
-	return sig;
+	return  (voice.next(rotary) * envelope.next())>>2;
+	//return voice.next(rotary);
 	// 14-bit output: -8192 to 8191
 }
 
@@ -229,7 +107,6 @@ void loop(){
 //////////////////////////////////////////////////////////////////////////
 // READ /////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
-
 void readRotary(){
 	_rotary = rotary; // set previous values for state change detection
 	for(int i = 0; i < 8; i++){
