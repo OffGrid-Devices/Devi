@@ -18,7 +18,7 @@ Mozzi version = master(22-04-2018)
 #pragma GCC push_options
 #pragma GCC optimize (OPTIMIZATION)
 
-#define CONTROL_RATE 256 // must be called above MozziGuts because of my code architecture....
+#define CONTROL_RATE 128 // must be called above MozziGuts because of my code architecture....
 // 512 is optimal for Ead
 // 64 is optimal for ADSR
 #include <EEPROM.h>
@@ -50,23 +50,25 @@ Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> osc[NUMVOICES];
 Voice voice[NUMVOICES];
 uint8_t valloc[NUMVOICES];
 uint8_t depth[NUMVOICES];
+uint8_t coarse[NUMVOICES];
+Q16n16 detune[NUMVOICES];
+Q16n16 vnote[NUMVOICES];
 
 //////////////////////////////////////////////////////////////////////////
 // MIDI /////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 void HandleNoteOn(byte channel, byte note, byte velocity){
-	  for (unsigned int i = 0; i < NUMVOICES; i++){
+	  for (uint8_t i = 0; i < NUMVOICES; i++){
 		  if(valloc[i]==0){
 			valloc[i] = note;
-			osc[i].setFreq(mtof(note));
+			vnote[i] = Q16n0_to_Q16n16(note);
 			voice[i].noteOn();
 			break;
 		  }
 	  }
-	  
 }
 void HandleNoteOff(byte channel, byte note, byte velocity){
-	for (unsigned int i = 0; i < NUMVOICES; i++){
+	for (uint8_t i = 0; i < NUMVOICES; i++){
 		if(valloc[i]==note){
 			valloc[i] = 0;
 			voice[i].noteOff();
@@ -95,14 +97,25 @@ void setup(){
 	setupFastAnalogRead(FASTEST_ADC);
 }
 
+//////////////////////////////////////////////////////////////////////////
+// CONTROL///////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 void updateControl(){
 	MIDI.read();
 	readRotary();
 	for(uint8_t i = 0; i < NUMVOICES; i++){
+		// envelope update
 		voice[i].updateEnvelope(depth[i]);
+		// oscillator update
+		detune[i] =  mozziAnalogRead(A5)/1024.f -0.5f;
+		float freq = Q16n16_mtof(detune[i]+vnote[i]);
+		osc[i].setFreq_Q16n16(freq);
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////
+// AUDIO ////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 int updateAudio(){ 
 	int sig = 0; 
 	for (int i = 0; i < NUMVOICES; i++)
@@ -113,10 +126,7 @@ int updateAudio(){
 	//return voice.next(rotary);
 	// 14-bit output: -8192 to 8191
 }
-
-void loop(){
-  audioHook();
-}
+void loop(){ audioHook(); }
 
 //////////////////////////////////////////////////////////////////////////
 // SETUP ////////////////////////////////////////////////////////////////
