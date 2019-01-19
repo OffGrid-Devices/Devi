@@ -50,9 +50,8 @@ Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> osc[NUMVOICES];
 Voice voice[NUMVOICES];
 uint8_t valloc[NUMVOICES];
 uint8_t depth[NUMVOICES];
-uint8_t coarse[NUMVOICES];
-Q16n16 detune[NUMVOICES];
 Q16n16 vnote[NUMVOICES];
+Q16n16 detune[NUMVOICES];
 
 //////////////////////////////////////////////////////////////////////////
 // MIDI /////////////////////////////////////////////////////////////////
@@ -85,7 +84,6 @@ void setup(){
 	MIDI.setHandleNoteOn(HandleNoteOn); 
 	MIDI.setHandleNoteOff(HandleNoteOff);
 	MIDI.begin(MIDI_CHANNEL_OMNI);	
-	
 	for (uint8_t i = 0; i < NUMVOICES; i++)
 	{
 		osc[i].setTable(SIN2048_DATA);
@@ -107,9 +105,8 @@ void updateControl(){
 		// envelope update
 		voice[i].updateEnvelope(depth[i]);
 		// oscillator update
-		detune[i] =  mozziAnalogRead(A5)/1024.f -0.5f;
-		float freq = Q16n16_mtof(detune[i]+vnote[i]);
-		osc[i].setFreq_Q16n16(freq);
+		detune[i] =  float_to_Q16n16( mozziAnalogRead(A5)/1024.f -0.5f );
+		osc[i].setFreq_Q16n16( Q16n16_mtof(detune[i] + vnote[i]) );
 	}
 }
 
@@ -129,7 +126,7 @@ int updateAudio(){
 void loop(){ audioHook(); }
 
 //////////////////////////////////////////////////////////////////////////
-// SETUP ////////////////////////////////////////////////////////////////
+// SETUP FUNCTIONS //////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
@@ -144,7 +141,6 @@ void readRotary(){
 		if( bit_get(PIND, BIT(i)) ) rotary = i+8;
 	}
 }
-
 
 //////////////////////////////////////////////////////////////////////////
 // MEM ///////////////////////////////////////////////////////////////////
