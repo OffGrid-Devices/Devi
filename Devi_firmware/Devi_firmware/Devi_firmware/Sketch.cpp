@@ -20,6 +20,7 @@ Mozzi version = master(22-04-2018)
 #pragma GCC push_options
 #pragma GCC optimize (OPTIMIZATION)
 
+#define CONTROL_RATE 32 // must be called above MozziGuts because of my code architecture....
 // 512 is optimal for Ead
 // 64 is optimal for ADSR
 // 256 is a nice value
@@ -32,9 +33,9 @@ MIDI_CREATE_DEFAULT_INSTANCE();
 #include <mozzi_midi.h>
 #include <ADSR.h>
 #include "GLOBALS.h"
-//#include "Voice.h"
-#include <Oscil.h>
-#include "tables/sin2048_int8.h"
+#include "Voice.h"
+/*#include <Oscil.h>
+#include "tables/sin2048_int8.h"*/
 
 
 
@@ -52,58 +53,63 @@ void readRotary();
 //////////////////////////////////////////////////////////////////////////
 // CLASSES //////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
-//Voice voice;
-Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> osc[NUMVOICES];
+Voice voice[NUMVOICES];
+uint8_t valloc[NUMVOICES];
+/*Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> osc[NUMVOICES];
 ADSR <CONTROL_RATE, AUDIO_RATE> env[NUMVOICES];
-uint8_t voice[NUMVOICES];
+uint8_t voice[NUMVOICES];*/
 
-//uint8_t note1, note2, note3, note4;
-uint16_t attack = 100, decay = 100, release = 3000;  
+/*uint16_t attack = 100, decay = 100, release = 3000;  
 uint8_t sustain	= 255; // (aka decay level)
 uint8_t atklevel = 255;
-uint16_t sustime = 65535;
+uint16_t sustime = 65535;*/
+
 //////////////////////////////////////////////////////////////////////////
 // MAIN FUNCTIONS ///////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 void HandleNoteOn(byte channel, byte note, byte velocity){
 	  //digitalWrite(PINLED7, HIGH);
 	  for (unsigned int i = 0; i < NUMVOICES; i++){
-		  if(voice[i]==0){
-			voice[i] = note;
-			osc[i].setFreq(mtof(note));
-			env[i].noteOn();
+		  if(valloc[i]==0){
+			valloc[i] = note;
+			voice[i].setPitch(note);
+			voice[i].noteOn();
 			break;
 		  }
 	  }
+	  
 }
 void HandleNoteOff(byte channel, byte note, byte velocity){
 	//digitalWrite(PINLED7, LOW);
 	for (unsigned int i = 0; i < NUMVOICES; i++){
-		if(voice[i]==note){
-			voice[i] = 0;
-			env[i].noteOff();
+		if(valloc[i]==note){
+			valloc[i] = 0;
+			voice[i].noteOff();
 			break;
 		}
 	}
 }
 
-void setup(){
-	pinMode(PINLED7, OUTPUT);
-	
+void setup(){	
 	MIDI.setHandleNoteOn(HandleNoteOn); 
 	MIDI.setHandleNoteOff(HandleNoteOff);
 	MIDI.begin(MIDI_CHANNEL_OMNI);	
 	
-	//voice.init(60, CONTROL_RATE);	
+	for (uint8_t i = 0; i < NUMVOICES; i++)
+	{
+		voice[i].init(60, CONTROL_RATE);
+	}
+	
+		
 	
 	startMozzi(CONTROL_RATE);
 	setupFastAnalogRead(FASTEST_ADC);
 	
-	for(uint8_t i = 0; i < NUMVOICES; i++){
+	/*for(uint8_t i = 0; i < NUMVOICES; i++){
 		osc[i].setTable(SIN2048_DATA);
 		env[i].setADLevels(255, sustain);
 		env[i].setTimes(attack, decay, sustime, release);
-	}
+	}*/
 }
 
 void updateControl(){
@@ -112,18 +118,18 @@ void updateControl(){
 	readRotary();
 	
 	for(uint8_t i = 0; i < NUMVOICES; i++){
-		env[i].update();
+		voice[i].updateEnvelope();
 	}
-
 }
 
 int updateAudio(){ 
 	int sig = 0; 
 	for (int i = 0; i < NUMVOICES; i++)
 	{
-		sig += ((int)osc[i].next() * env[i].next())>>4;
+		sig += voice[i].next(rotary)>>1;//>>2;
 	}
-	return sig; 
+	return sig >> 1;
+	//return voice.next(rotary);
 	// 14-bit output: -8192 to 8191
 }
 

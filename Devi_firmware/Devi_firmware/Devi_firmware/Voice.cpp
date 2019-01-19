@@ -41,7 +41,7 @@ void Voice::init(uint8_t note, uint16_t ctrl_rate){
 	att=25, dcy=450;
 }
 
-int8_t Voice::next(uint8_t algo){
+int Voice::next(uint8_t algo){
 	int sig;
 	switch(algo){ 
 		case 0: 
@@ -177,16 +177,19 @@ int8_t Voice::next(uint8_t algo){
 		break;
 		
 	}
-	return sig;
-	// 8-bit output: -256 to 255
+	return (gain * sig)>>2;
+	// output: -8192 to 8191
 }
 
-void Voice::triggerEnv(){
-	dca->start(att, dcy);
+void Voice::noteOn(){
+	dca->start(att, 65535);
+}
+void Voice::noteOff(){
+	dca->start(0, dcy);
 }
 
 void Voice::updateEnvelope(){
-	gain = dca->next();
+	gain = (int) dca->next();
 }
 
 
@@ -204,6 +207,12 @@ void Voice::setFreq(uint8_t i, float f){
 		case 4:	osc4.setFreq(f); break;
 		default: break;
 	}
+}
+void Voice::setPitch(uint8_t n){
+	osc1.setFreq(mtof(n));
+	osc2.setFreq(mtof(n-12));
+	osc3.setFreq(mtof(n-24));
+	osc4.setFreq(mtof(n-36));
 }
 
 /*void Voice::setPitch(uint8_t note){

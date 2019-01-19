@@ -53,14 +53,15 @@ class Voice
 		~Voice();
 		
 		void init(uint8_t note, uint16_t ctrl_rate);
-		int8_t next(uint8_t algo);
-		void triggerEnv(); // trigger envelope
+		int next(uint8_t algo);
+		void noteOn(); // attack portion
+		void noteOff(); // decay portion
 		void updateEnvelope(); // update envelope
 	
 		// Set oscillator parameters 
 		//void setPitch(uint8_t note); // set carrier note->frequency
 		void setFreq(uint8_t i, float f);
-		
+		void setPitch(uint8_t n);
 		// Set envelope parameters
 		void setEnvAttack(unsigned int a); // set envelope attack 
 		void setEnvDecay(unsigned int d); // set envelope decay 
