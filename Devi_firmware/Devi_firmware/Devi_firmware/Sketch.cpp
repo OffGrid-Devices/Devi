@@ -1,6 +1,4 @@
-﻿// TODO: make sin table 14-bit instead of 8-bit?
-
-/*Begining of Auto generated code by Atmel studio */
+﻿/*Begining of Auto generated code by Atmel studio */
 #include <Arduino.h>
 /*End of auto generated code by Atmel studio */
 
@@ -20,28 +18,23 @@ Mozzi version = master(22-04-2018)
 #pragma GCC push_options
 #pragma GCC optimize (OPTIMIZATION)
 
-#define CONTROL_RATE 32 // must be called above MozziGuts because of my code architecture....
+#define CONTROL_RATE 256 // must be called above MozziGuts because of my code architecture....
 // 512 is optimal for Ead
 // 64 is optimal for ADSR
-// 256 is a nice value
 #include <EEPROM.h>
 #include <MIDI.h>
-MIDI_CREATE_DEFAULT_INSTANCE();
 #include <MozziGuts.h>
 #include <mozzi_rand.h>
 #include <mozzi_fixmath.h>
 #include <mozzi_midi.h>
-#include <ADSR.h>
+#include <Oscil.h>
+#include "tables/sin2048_int8.h"*/
 #include "GLOBALS.h"
 #include "Voice.h"
-/*#include <Oscil.h>
-#include "tables/sin2048_int8.h"*/
-
-
 
 //Beginning of Auto generated function prototypes by Atmel Studio
 void updateControl();
-int updateAudio();
+int  updateAudio();
 void HandleNoteOn(byte channel, byte note, byte velocity);
 void HandleNoteOff(byte channel, byte note, byte velocity);
 
@@ -51,28 +44,21 @@ void readRotary();
 
 
 //////////////////////////////////////////////////////////////////////////
-// CLASSES //////////////////////////////////////////////////////////////
+// OBJECTS //////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
+Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> osc[NUMVOICES];
 Voice voice[NUMVOICES];
 uint8_t valloc[NUMVOICES];
-/*Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> osc[NUMVOICES];
-ADSR <CONTROL_RATE, AUDIO_RATE> env[NUMVOICES];
-uint8_t voice[NUMVOICES];*/
-
-/*uint16_t attack = 100, decay = 100, release = 3000;  
-uint8_t sustain	= 255; // (aka decay level)
-uint8_t atklevel = 255;
-uint16_t sustime = 65535;*/
+uint8_t depth[NUMVOICES];
 
 //////////////////////////////////////////////////////////////////////////
-// MAIN FUNCTIONS ///////////////////////////////////////////////////////
+// MIDI /////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 void HandleNoteOn(byte channel, byte note, byte velocity){
-	  //digitalWrite(PINLED7, HIGH);
 	  for (unsigned int i = 0; i < NUMVOICES; i++){
 		  if(valloc[i]==0){
 			valloc[i] = note;
-			voice[i].setPitch(note);
+			osc[i].setFreq(mtof(note));
 			voice[i].noteOn();
 			break;
 		  }
@@ -80,7 +66,6 @@ void HandleNoteOn(byte channel, byte note, byte velocity){
 	  
 }
 void HandleNoteOff(byte channel, byte note, byte velocity){
-	//digitalWrite(PINLED7, LOW);
 	for (unsigned int i = 0; i < NUMVOICES; i++){
 		if(valloc[i]==note){
 			valloc[i] = 0;
@@ -90,35 +75,31 @@ void HandleNoteOff(byte channel, byte note, byte velocity){
 	}
 }
 
-void setup(){	
+//////////////////////////////////////////////////////////////////////////
+// MAIN FUNCTIONS ///////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+MIDI_CREATE_DEFAULT_INSTANCE();
+void setup(){		
 	MIDI.setHandleNoteOn(HandleNoteOn); 
 	MIDI.setHandleNoteOff(HandleNoteOff);
 	MIDI.begin(MIDI_CHANNEL_OMNI);	
 	
 	for (uint8_t i = 0; i < NUMVOICES; i++)
 	{
-		voice[i].init(60, CONTROL_RATE);
+		osc[i].setTable(SIN2048_DATA);
+		voice[i].init(CONTROL_RATE);
+		depth[i] = 255;
 	}
-	
-		
 	
 	startMozzi(CONTROL_RATE);
 	setupFastAnalogRead(FASTEST_ADC);
-	
-	/*for(uint8_t i = 0; i < NUMVOICES; i++){
-		osc[i].setTable(SIN2048_DATA);
-		env[i].setADLevels(255, sustain);
-		env[i].setTimes(attack, decay, sustime, release);
-	}*/
 }
 
 void updateControl(){
 	MIDI.read();
-	
 	readRotary();
-	
 	for(uint8_t i = 0; i < NUMVOICES; i++){
-		voice[i].updateEnvelope();
+		voice[i].updateEnvelope(depth[i]);
 	}
 }
 
@@ -126,9 +107,9 @@ int updateAudio(){
 	int sig = 0; 
 	for (int i = 0; i < NUMVOICES; i++)
 	{
-		sig += voice[i].next(rotary)>>1;//>>2;
+		sig += (voice[i].next() * osc[i].next() )>>6; //ensure output: -4096 to 4095
 	}
-	return sig >> 1;
+	return sig;
 	//return voice.next(rotary);
 	// 14-bit output: -8192 to 8191
 }
@@ -153,9 +134,7 @@ void readRotary(){
 		if( bit_get(PIND, BIT(i)) ) rotary = i+8;
 	}
 }
-//////////////////////////////////////////////////////////////////////////
-// MIDI /////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
+
 
 //////////////////////////////////////////////////////////////////////////
 // MEM ///////////////////////////////////////////////////////////////////

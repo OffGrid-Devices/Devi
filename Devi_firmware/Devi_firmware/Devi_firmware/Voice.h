@@ -13,19 +13,7 @@
 #pragma GCC optimize (OPTIMIZATION)
 
 #include <mozzi_config.h>
-#include <Oscil.h>
 #include <Ead.h>
-#include <mozzi_midi.h>
-// wavetables 
-#include "tables/sin2048_int8.h"
-#include "tables/triangle_dist_cubed_2048_int8.h"
-#include "tables/triangle_valve_2_2048_int8.h"
-#include "tables/saw2048_int8.h"
-#include "tables/square_analogue512_int8.h"
-#include "tables/square_no_alias_2048_int8.h"
-#include "tables/brownnoise8192_int8.h"
-#include "tables/pinknoise8192_int8.h"
-
 
 class Voice
 {
@@ -33,35 +21,20 @@ class Voice
 	public:
 	protected:
 	private:
-		Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> osc1;
-		Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> osc2;
-		Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> osc3;
-		Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> osc4;
-		
 		Ead* dca;
 		int gain;
 		unsigned int att, dcy;
-		
-		Q15n16 mod1, mod2, mod3;
-		uint8_t depth = 255;
-		
-		float freq[4];
-
 	//functions
 	public:
 		Voice();
 		~Voice();
 		
-		void init(uint8_t note, uint16_t ctrl_rate);
-		int next(uint8_t algo);
+		void init(uint16_t ctrl_rate);
+		int next();
 		void noteOn(); // attack portion
 		void noteOff(); // decay portion
 		void updateEnvelope(); // update envelope
-	
-		// Set oscillator parameters 
-		//void setPitch(uint8_t note); // set carrier note->frequency
-		void setFreq(uint8_t i, float f);
-		void setPitch(uint8_t n);
+		void updateEnvelope(uint8_t depth); // update envelope with depth amount
 		// Set envelope parameters
 		void setEnvAttack(unsigned int a); // set envelope attack 
 		void setEnvDecay(unsigned int d); // set envelope decay 
