@@ -116,11 +116,20 @@ void updateControl(){
 // AUDIO ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 int updateAudio(){ 
-	int sig = 0; 
-	for (int i = 0; i < NUMVOICES; i++)
-	{
-		sig += (voice[i].next() * osc[i].next() )>>6; //ensure output: -4096 to 4095
+	int sig = 0;
+	switch(rotary){
+		case 0: 
+		/* [1] | [2] | [3] | [4] | [5] | [6] | 6-voices*/
+			for (int i = 0; i < NUMVOICES; i++)
+			{
+				sig += (voice[i].next() * osc[i].next() )>>6; //ensure final sum is -8192 to 8191
+			}
+		break;
+		
+		default:
+		break;
 	}
+	
 	return sig;
 	//return voice.next(rotary);
 	// 14-bit output: -8192 to 8191
