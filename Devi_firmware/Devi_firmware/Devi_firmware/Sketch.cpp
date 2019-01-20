@@ -18,7 +18,7 @@ Mozzi version = master(22-04-2018)
 #pragma GCC push_options
 #pragma GCC optimize (OPTIMIZATION)
 
-#define CONTROL_RATE 64 // must be called above MozziGuts because of my code architecture....
+#define CONTROL_RATE 128 // must be called above MozziGuts because of my code architecture....
 // 512 is optimal for Ead
 // 64 is optimal for ADSR
 #include <EEPROM.h>
@@ -51,7 +51,6 @@ Q8n0 depth[NUMVOICES];
 Q8n0 vnote[NUMVOICES];
 float detune[NUMVOICES];
 Q7n0 coarse[NUMVOICES];
-Q7n0 coarselist[8] = {-36, -24, -12, 0, 12, 24, 36, 48};
 
 //////////////////////////////////////////////////////////////////////////
 // MIDI /////////////////////////////////////////////////////////////////
@@ -105,8 +104,9 @@ void updateControl(){
 		// envelope update
 		voice[i].updateEnvelope(depth[i]);
 		// oscillator update
-		coarse[i] = coarselist[mozziAnalogRead(A4)>>7];
-		detune[i] = mozziAnalogRead(A5)/1024.f -0.5f;
+		coarse[i] = coarseTable[mozziAnalogRead(A4)>>7];
+		//detune[i] = mozziAnalogRead(A5)/1024.f -0.5f;
+		detune[i] = detuneTable[mozziAnalogRead(A5)>>3];
 		Q16n16 notein = float_to_Q16n16(detune[i] + coarse[i] + vnote[i] );
 		osc[i].setFreq_Q16n16( Q16n16_mtof(notein)); 
 	}

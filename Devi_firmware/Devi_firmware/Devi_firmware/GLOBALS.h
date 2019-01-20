@@ -15,7 +15,6 @@
 #pragma GCC optimize (OPTIMIZATION)
 
 // INCLUDES
-#include <Metronome.h>
 
 // MACROS
 #define bit_get(p,m) ((p) & (m))
@@ -77,18 +76,13 @@ uint8_t lfowave[8]; // lfo waveform: 0-sin, 1-tri, 2-rampup, 3-rampdown, 4-squar
 
 // NON-STORED VARIABLES
 uint8_t rotary, _rotary; // current and previous rotary switch value 
-uint8_t mode = 0; // 0-Sequencer, 1-Trigger, 2-Edit, 3-Save
-
-uint16_t bpm = 4*120, _bpm = bpm; // bpm and previous bpm 
-Metronome metro(60000/bpm/2); // 120bpm
-boolean seqTrigger = 1; // actually runs at twice the audible sequencer rate to turn bpm led indicator on/off (1-triggers envelopes and led on; 0- triggers led off)
-int8_t step = 0; // current sequencer step
-boolean stepDir = 1; // 1-up, 0-down //TODO: store stepDir variable????
-boolean seqOnOff = true; // is sequencer On? //TODO: store seqOnOff variable????
-
 uint8_t ledPinSequence[6] = {17, 16, 6, 7, 8, 9};
 
+// TABLES 
+float detuneTable[128] = {-0.5, -0.49, -0.48, -0.48, -0.47, -0.46, -0.45, -0.45, -0.44, -0.43, -0.42, -0.41, -0.41, -0.4, -0.39, -0.38, -0.38, -0.37, -0.36, -0.35, -0.34, -0.34, -0.33, -0.32, -0.31, -0.3, -0.3, -0.29, -0.28, -0.27, -0.27, -0.26, -0.25, -0.24, -0.23, -0.23, -0.22, -0.21, -0.2, -0.2, -0.19, -0.18, -0.17, -0.16, -0.16, -0.15, -0.14, -0.13, -0.13, -0.12, -0.11, -0.1, -0.09, -0.09, -0.08, -0.07, -0.06, -0.05, -0.05, -0.04, -0.03, -0.02, -0.02, -0.01, 0., 0.01, 0.02, 0.02, 0.03, 0.04, 0.05, 0.05, 0.06, 0.07, 0.08, 0.09, 0.09, 0.1, 0.11, 0.12, 0.13, 0.13, 0.14, 0.15, 0.16, 0.16, 0.17, 0.18, 0.19, 0.2, 0.2, 0.21, 0.22, 0.23, 0.23, 0.24, 0.25, 0.26, 0.27, 0.27, 0.28, 0.29, 0.3, 0.3, 0.31, 0.32, 0.33, 0.34, 0.34, 0.35, 0.36, 0.37, 0.38, 0.38, 0.39, 0.4, 0.41, 0.41, 0.42, 0.43, 0.44, 0.45, 0.45, 0.46, 0.47, 0.48, 0.48, 0.49,};
+Q7n0 coarseTable[8] = {-36, -24, -12, 0, 12, 24, 36, 48};
 
+	
 #pragma GCC pop_options
 
 #endif /* GLOBALS_H_ */
