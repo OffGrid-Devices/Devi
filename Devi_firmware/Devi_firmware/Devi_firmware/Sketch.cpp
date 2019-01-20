@@ -18,7 +18,7 @@ Mozzi version = master(22-04-2018)
 #pragma GCC push_options
 #pragma GCC optimize (OPTIMIZATION)
 
-#define CONTROL_RATE 128 // must be called above MozziGuts because of my code architecture....
+#define CONTROL_RATE 64 // must be called above MozziGuts because of my code architecture....
 // 512 is optimal for Ead
 // 64 is optimal for ADSR
 #include <EEPROM.h>
@@ -41,17 +41,17 @@ void HandleNoteOff(byte channel, byte note, byte velocity);
 void readRotary();
 //End of Auto generated function prototypes by Atmel Studio
 
-
-
 //////////////////////////////////////////////////////////////////////////
 // OBJECTS //////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 Oscil <SIN2048_NUM_CELLS, AUDIO_RATE> osc[NUMVOICES];
 Voice voice[NUMVOICES];
-uint8_t valloc[NUMVOICES];
-uint8_t depth[NUMVOICES];
-Q16n16 vnote[NUMVOICES];
-Q16n16 detune[NUMVOICES];
+Q8n0 valloc[NUMVOICES];
+Q8n0 depth[NUMVOICES];
+Q8n0 vnote[NUMVOICES];
+float detune[NUMVOICES];
+Q7n0 coarse[NUMVOICES];
+Q7n0 coarselist[8] = {-36, -24, -12, 0, 12, 24, 36, 48};
 
 //////////////////////////////////////////////////////////////////////////
 // MIDI /////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ void HandleNoteOn(byte channel, byte note, byte velocity){
 	  for (uint8_t i = 0; i < NUMVOICES; i++){
 		  if(valloc[i]==0){
 			valloc[i] = note;
-			vnote[i] = Q16n0_to_Q16n16(note);
+			vnote[i] = note;
 			voice[i].noteOn();
 			break;
 		  }
@@ -105,8 +105,10 @@ void updateControl(){
 		// envelope update
 		voice[i].updateEnvelope(depth[i]);
 		// oscillator update
-		detune[i] =  float_to_Q16n16( mozziAnalogRead(A5)/1024.f -0.5f );
-		osc[i].setFreq_Q16n16( Q16n16_mtof(detune[i] + vnote[i]) );
+		coarse[i] = coarselist[mozziAnalogRead(A4)>>7];
+		detune[i] = mozziAnalogRead(A5)/1024.f -0.5f;
+		Q16n16 notein = float_to_Q16n16(detune[i] + coarse[i] + vnote[i] );
+		osc[i].setFreq_Q16n16( Q16n16_mtof(notein)); 
 	}
 }
 

@@ -10,7 +10,7 @@
 #define GLOBALS_H_
 
 // COMPILER
-#define OPTIMIZATION "O3"
+#define OPTIMIZATION "O2"
 #pragma GCC push_options
 #pragma GCC optimize (OPTIMIZATION)
 
